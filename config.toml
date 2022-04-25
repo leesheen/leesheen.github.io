@@ -1,7 +1,7 @@
 baseURL = "https://leesheen.github.io/"
 languageCode = "zh-cn"		# for rss
 defaultContentLanguage = "zh-cn"                             # en / zh-cn / ... (This field determines which i18n file to use)
-title = "Lee Sheen"
+title = "Lee Sheen ｜ 践行 Feynman 学习法的地方"
 summaryLength = 140                                        # 默认是70，显示文章摘要的长度
 disablePathToLower = true
 preserveTaxonomyNames = true
@@ -61,9 +61,9 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   gitRepo = ""
 
   # site info (optional)                                  # 站点信息（可选，不需要的可以直接注释掉）
-  logoTitle = ""        # default: the title value    # 默认值: 上面设置的title值
+  logoTitle = "Lee Sheen"        # default: the title value    # 默认值: 上面设置的title值
   keywords = ["Lee Sheen", "leesheen", "Linux", "Kernel"]
-  description = "践行 Feynman Technique 的地方."
+  description = "LeeSheen's Blog"
 
   # paginate of archives, tags and categories             # 归档、标签、分类每页显示的文章数目，建议修改为一个较大的值
   archivePaginate = 50
@@ -97,9 +97,9 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   contentCopyright = '<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png" /></a>'     # e.g. '<a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a>'
 
   # TODO
-  baiduPush = false        # baidu push                  # 百度
-  baiduAnalytics = ""      # Baidu Analytics
-  baiduVerification = "code-WHTK5fpr5d"   # Baidu Verification
+  # baiduPush = false        # baidu push                  # 百度
+  # baiduAnalytics = ""      # Baidu Analytics
+  # baiduVerification = "code-WHTK5fpr5d"   # Baidu Verification
   googleVerification = "R8TWP3APKMZYoldmneq0ofw6zEVVBIgs5Yv8SiivZ9o"  # Google Verification         # 谷歌
 
   # Link custom CSS and JS assets
