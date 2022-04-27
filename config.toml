@@ -157,7 +157,7 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   [params.social]                                         # 社交链接
     a-email = "mailto:lixin.engr@gmail.com"
     b-github = "https://github.com/leesheen"
-	c-twitter = "https://twitter.com/leesheen"
+	c-twitter = "https://twitter.com/Lee_Sheen"
      #a-email = "mailto:your@email.com"
      #b-stack-overflow = "http://localhost:1313"
      #c-twitter = "http://localhost:1313"
