@@ -3,7 +3,7 @@ languageCode = "zh-cn"		# for rss
 defaultContentLanguage = "zh-cn"                             # en / zh-cn / ... (This field determines which i18n file to use)
 title = "Lee Sheen ｜ 践行 Feynman 学习法的地方"
 summaryLength = 140                                        # 默认是70，显示文章摘要的长度
-disablePathToLower = true
+disablePathToLower = false
 preserveTaxonomyNames = true
 enableRobotsTXT = true
 enableEmoji = true
@@ -21,6 +21,10 @@ paginate = 10                                              # 首页每页显示�
 disqusShortname = ""      # disqus_shortname
 googleAnalytics = "UA-226953304-2"      # UA-XXXXXXXX-X
 copyright = ""            # default: author.name ↓        # 默认为下面配置的author.name ↓
+uglyURLs = true          # please keep same with uglyurls setting
+
+[permalinks]
+  'post' = '/:year/:month/:filename/'
 
 [author]                  # essential                     # 必需
   name = "Lee Sheen"
@@ -106,8 +110,6 @@ copyright = ""            # default: author.name ↓        # 默认为下面配
   #   (relative to /static/css and /static/js respectively)
   customCSS = []
   customJS = []
-
-  uglyURLs = false          # please keep same with uglyurls setting
 
   # Show language selector for multilingual site.
   showLanguageSelector = false
