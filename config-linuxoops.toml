@@ -21,7 +21,7 @@ paginate = 10                                              # 首页每页显示�
 disqusShortname = ""      # disqus_shortname
 googleAnalytics = "UA-226953304-2"      # UA-XXXXXXXX-X
 copyright = ""            # default: author.name ↓        # 默认为下面配置的author.name ↓
-uglyURLs = true          # please keep same with uglyurls setting
+uglyURLs = false          # please keep same with uglyurls setting
 
 [permalinks]
   'post' = '/:year/:month/:filename/'
