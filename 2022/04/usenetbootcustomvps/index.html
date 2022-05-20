@@ -1,0 +1,366 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>使用 netboot.xyz 定制 VPS 操作系统 - Lee Sheen ｜ 践行 Feynman 学习法的地方</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="Lee Sheen"><meta name=description content="前段时间使用 Oracle Cloud ARM VPS 测试内核，没有设置好 kconfig，导致 VPS 无法启动。Oracle Cloud 不支持重装，ARM 机器也非常难申请，所以想办法恢复。Google 的过程中意外发现了 netboot.xyz 这个工具。它可以解决有些 VPS 无法安装指定操作系统的问题（比如 Arch Linux）。 必要性 该方案只对 VPS 安装操作系统，且安"><meta name=keywords content="Lee Sheen,leesheen,Linux,Kernel"><meta name=baidu-site-verification content="code-kIq1G2u3vq"><meta name=google-site-verification content="yZJn3Yy1q3xGzXdse0wIpVrV7OQ6sh6lch08sWU0ZIM"><meta name=generator content="Hugo 0.99.1 with theme even"><link rel=canonical href=https://linuxoops.com/2022/04/usenetbootcustomvps/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.b874a8796a492f0d7c86bb24c33cbf052935783a5778ebaf819a8e514bf49f10.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="使用 netboot.xyz 定制 VPS 操作系统"><meta property="og:description" content="前段时间使用 Oracle Cloud ARM VPS 测试内核，没有设置好 kconfig，导致 VPS 无法启动。Oracle Cloud 不支持重装，ARM 机器也非常难申请，所以想办法恢复。Google 的过程中意外发现了 netboot.xyz 这个工具。它可以解决有些 VPS 无法安装指定操作系统的问题（比如 Arch Linux）。 必要性 该方案只对 VPS 安装操作系统，且安"><meta property="og:type" content="article"><meta property="og:url" content="https://linuxoops.com/2022/04/usenetbootcustomvps/"><meta property="article:section" content="post"><meta property="article:published_time" content="2022-04-06T17:51:25+08:00"><meta property="article:modified_time" content="2022-04-06T17:51:25+08:00"><meta itemprop=name content="使用 netboot.xyz 定制 VPS 操作系统"><meta itemprop=description content="前段时间使用 Oracle Cloud ARM VPS 测试内核，没有设置好 kconfig，导致 VPS 无法启动。Oracle Cloud 不支持重装，ARM 机器也非常难申请，所以想办法恢复。Google 的过程中意外发现了 netboot.xyz 这个工具。它可以解决有些 VPS 无法安装指定操作系统的问题（比如 Arch Linux）。 必要性 该方案只对 VPS 安装操作系统，且安"><meta itemprop=datePublished content="2022-04-06T17:51:25+08:00"><meta itemprop=dateModified content="2022-04-06T17:51:25+08:00"><meta itemprop=wordCount content="2939"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="使用 netboot.xyz 定制 VPS 操作系统"><meta name=twitter:description content="前段时间使用 Oracle Cloud ARM VPS 测试内核，没有设置好 kconfig，导致 VPS 无法启动。Oracle Cloud 不支持重装，ARM 机器也非常难申请，所以想办法恢复。Google 的过程中意外发现了 netboot.xyz 这个工具。它可以解决有些 VPS 无法安装指定操作系统的问题（比如 Arch Linux）。 必要性 该方案只对 VPS 安装操作系统，且安"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>Lee Sheen</a></div><div class=mobile-navbar-icon><span></span>
+<span></span>
+<span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>最近更新</li></a><a href=/post/><li class=mobile-menu-item>归档</li></a><a href=/tags/><li class=mobile-menu-item>标签</li></a><a href=/categories/><li class=mobile-menu-item>分类</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>Lee Sheen</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>最近更新</a></li><li class=menu-item><a class=menu-item-link href=/post/>归档</a></li><li class=menu-item><a class=menu-item-link href=/tags/>标签</a></li><li class=menu-item><a class=menu-item-link href=/categories/>分类</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>使用 netboot.xyz 定制 VPS 操作系统</h1><div class=post-meta><span class=post-time>2022-04-06</span>
+<span class=more-meta>约 2939 字</span>
+<span class=more-meta>预计阅读 6 分钟</span></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>文章目录</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><a href=#必要性>必要性</a></li><li><a href=#netbootxyz>netboot.xyz</a><ul><li><a href=#简介>简介</a></li><li><a href=#快速使用>快速使用</a><ul><li><a href=#添加到-grub>添加到 GRUB</a></li><li><a href=#添加-uefi-固件>添加 UEFI 固件</a></li></ul></li></ul></li><li><a href=#安装记录>安装记录</a><ul><li><a href=#下载-netbootxyz-uefi-固件>下载 netboot.xyz UEFI 固件</a></li><li><a href=#设置-oracle-控制台>设置 Oracle 控制台</a></li><li><a href=#bios>BIOS</a></li><li><a href=#netbootxyz-1>netboot.xyz</a></li><li><a href=#安装系统>安装系统</a><ul><li><a href=#配置-alpine-linux-源>配置 Alpine Linux 源</a></li><li><a href=#安装需要的软件>安装需要的软件</a></li><li><a href=#磁盘分区>磁盘分区</a></li><li><a href=#安装-arch-linux-arm>安装 Arch Linux ARM</a></li><li><a href=#进一步配置>进一步配置</a></li><li><a href=#备份>备份</a></li></ul></li></ul></li><li><a href=#总结>总结</a><ul><li><a href=#关于压缩>关于压缩</a><ul><li><a href=#btrfs>btrfs</a></li><li><a href=#zram>zRAM</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><blockquote><p>前段时间使用 Oracle Cloud ARM VPS 测试内核，没有设置好 kconfig，导致 VPS 无法启动。Oracle Cloud 不支持重装，ARM 机器也非常难申请，所以想办法恢复。Google 的过程中意外发现了 netboot.xyz 这个工具。它可以解决有些 VPS 无法安装指定操作系统的问题（比如 Arch Linux）。</p></blockquote><h1 id=必要性>必要性</h1><p>该方案只对 VPS <strong>安装操作系统，且安装过程有特殊要求</strong> 的需求有价值。比如我的 VPS 存储空间有限，希望使用 btrfs 文件系统的压缩特性。</p><p>假如只想重装或更换 VPS 的操作系统，可以 Google 现成的 dd 脚本，既简单又方便。</p><p>当然，即使没有上述需求，也可以考虑在 VPS 上配置 netboot.xyz。可以作为应急恢复模式使用。</p><h1 id=netbootxyz>netboot.xyz</h1><h2 id=简介>简介</h2><p><a href=https://github.com/netbootxyz/netboot.xyz%5D>netboot.xyz</a> 可以通过网络直接引导常见的操作系统。它使用 iPXE，无需下载 ISO 镜像。</p><p>详细的使用文档详见<a href=https://netboot.xyz/docs/>官方文档</a>。</p><p><img src=/images/UseNetbootCustomVps/netboot-example.gif alt=netboot.xyz></p><h2 id=快速使用>快速使用</h2><h3 id=添加到-grub>添加到 GRUB</h3><p>常见的发行版都包含 <code>grub-imageboot</code>。安装后，将 <code>netboot.xyz.iso</code> 放到 <code>/boot/images</code>目录下，GRUB 就可以自动并完成配置，非常简单。</p><p>比如在 Debian/Ubuntu 下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Install grub-imageboot</span>
+</span></span><span class=line><span class=cl>apt install grub-imageboot
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Download netboot.xyz ISO</span>
+</span></span><span class=line><span class=cl>mkdir /boot/images
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /boot/images
+</span></span><span class=line><span class=cl>wget https://boot.netboot.xyz/ipxe/netboot.xyz.iso
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Update GRUB menu to include this ISO</span>
+</span></span><span class=line><span class=cl>update-grub2
+</span></span><span class=line><span class=cl>reboot
+</span></span></code></pre></td></tr></table></div></div><p>重启后，就可以在 GRUB 菜单中看到选项了。</p><p><img src=/images/UseNetbootCustomVps/netboot-GRUB.webp alt></p><h3 id=添加-uefi-固件>添加 UEFI 固件</h3><p>如果机器使用 UEFI 启动方式，可以直接使用 UEFI 固件。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir /boot/efi/EFI/rescue
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /boot/efi/EFI/rescue
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># for arm64 machine</span>
+</span></span><span class=line><span class=cl>wget https://boot.netboot.xyz/ipxe/netboot.xyz-arm64.efi
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># for x86_64 machine</span>
+</span></span><span class=line><span class=cl>wget https://boot.netboot.xyz/ipxe/netboot.xyz-snp.efi
+</span></span></code></pre></td></tr></table></div></div><p>重启进入 BIOS，可以通过选择启动文件的方式，启动 netboot.xyz。</p><p><img src=/images/UseNetbootCustomVps/OracleBIOS-5.webp alt></p><h1 id=安装记录>安装记录</h1><p>记录下 Oracle Cloud ARM 机器使用 netboot.xyz 安装 Arch Linux 的过程。</p><h2 id=下载-netbootxyz-uefi-固件>下载 netboot.xyz UEFI 固件</h2><p>可以按照 <strong>快速设置</strong> 章节的方法，将固件放到 EFI 文件目录中。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkdir /boot/efi/EFI/rescue
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /boot/efi/EFI/rescue
+</span></span><span class=line><span class=cl>wget https://boot.netboot.xyz/ipxe/netboot.xyz-arm64.efi
+</span></span></code></pre></td></tr></table></div></div><h2 id=设置-oracle-控制台>设置 Oracle 控制台</h2><p>Oracle 没有提供 VNC 登录的功能，需要配置登录 Cloud Shell，就可以管理机器了。</p><p>除了命令行外，使用 Cloud Shell 还可以控制机器的 BIOS（开机 F2）。</p><p>创建好 Cloud Shell 后，可以直接复制登陆需要的 SSH 命令登陆。如下图所示：</p><p><img src=/images/UseNetbootCustomVps/OracleConsole.webp alt></p><h2 id=bios>BIOS</h2><p>重启 VPS，按 F2 可进入 BIOS。</p><p>选择 <code>Boot Maintenance Manager</code> &ndash;> <code>Boot From File</code>，然后按照上述文件路径选择 netboot.xyz 的启动固件。</p><p><img src=/images/UseNetbootCustomVps/OracleBIOS-1.webp alt></p><p><img src=/images/UseNetbootCustomVps/OracleBIOS-2.webp alt></p><p><img src=/images/UseNetbootCustomVps/OracleBIOS-3.webp alt></p><p><img src=/images/UseNetbootCustomVps/OracleBIOS-4.webp alt></p><p><img src=/images/UseNetbootCustomVps/OracleBIOS-5.webp alt></p><h2 id=netbootxyz-1>netboot.xyz</h2><p>选择固件后，就可以进入 netboot.xyz 了。如下图所示，netboot.xyz 会自动配置网络，并使用 iPXE 拉取相关镜像。</p><p><img src=/images/UseNetbootCustomVps/netboot-1.webp alt></p><p>除了引导操作系统外，netboot.xyz 还提供了一些功能。如下图所示。</p><p>这里选择 <code>Linux Network Installs</code>。</p><p><img src=/images/UseNetbootCustomVps/netboot-2.webp alt></p><p>针对 arm64 设备，netboot.xyz 没有提供 Arch Linux 的安装镜像。这里选择启动先引导相对轻量的 Alpine Linux，然后通过它再安装 Arch Linux。</p><p>假如机器是 x86_64 架构，可以直接选择 Arch Linux 镜像安装。</p><p><img src=/images/UseNetbootCustomVps/netboot-3.webp alt></p><p><img src=/images/UseNetbootCustomVps/netboot-4.webp alt></p><p>选择后，netboot.xyz 会使用 iPXE 拉取 Alpine Linux 的引导内核和镜像。</p><p>完成后就会进入登陆界面。使用 <code>root</code> 用户无需密码即可登陆。</p><p><img src=/images/UseNetbootCustomVps/netboot-5.webp alt></p><h2 id=安装系统>安装系统</h2><h3 id=配置-alpine-linux-源>配置 Alpine Linux 源</h3><p>安装 Arch Linux ARM 过程中，需要用到 Alpine Linux <code>community</code> 仓库的软件包。</p><p>配置 Alpine Linux 源，将 <code>community</code> 仓库对应的第三行解注释，并更新仓库数据：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vi /etc/apk/repositories
+</span></span><span class=line><span class=cl><span class=c1># 删除第三行的 ‘#’</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>apk update
+</span></span></code></pre></td></tr></table></div></div><p><img src=/images/UseNetbootCustomVps/netboot-6.webp alt></p><h3 id=安装需要的软件>安装需要的软件</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>apk add dosfstools e2fsprogs libarchive-tools pacman arch-install-scripts parted btrfs-progs
+</span></span></code></pre></td></tr></table></div></div><h3 id=磁盘分区>磁盘分区</h3><p>Oracle Cloud ARM 默认包含两个分区，<code>/dev/sda15</code>是 EFI 分区，大小为 100MiB，即上文存放 netboot.xyz 固件的地方。 <code>/dev/sda1</code> 是数据盘，即 Linux 系统的根分区。空间是申请机器选择的磁盘大小减去EFI空间后的剩余。</p><p>我的机器磁盘空间一共是 100GiB，希望使用 <code>btrfs</code> 文件系统。<strong>为了避免一些引导的麻烦</strong>，我将剩余空间分为两份：</p><ul><li><code>/dev/sda1</code> 划分了 1GiB，作为 <code>/boot</code> 分区，使用 <code>ext4</code> 文件系统，存放操作系统引导需要的文件（因为我需要经常换内核，所以空间稍大了些）。</li><li>剩余的空间全给到 <code>/dev/sda2</code> ，作为根分区，使用<code>btrfs</code> 文件系统。</li></ul><p>划分好的磁盘如下所示：</p><p><img src=/images/UseNetbootCustomVps/netboot-7.webp alt></p><p>按需划好磁盘后，使用对应的工具，将所有分区格式化。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mkfs.vfat /dev/sda15
+</span></span><span class=line><span class=cl>mkfs.ext4 /dev/sda1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#https://btrfs.wiki.kernel.org/index.php/Problem_FAQ#I_get_the_message_.22failed_to_open_.2Fdev.2Fbtrfs-control_skipping_device_registration.22_from_.22btrfs_dev_scan.22</span>
+</span></span><span class=line><span class=cl>mknod /dev/btrfs-control c <span class=m>10</span> <span class=m>234</span> 
+</span></span><span class=line><span class=cl>mkfs.btrfs /dev/sda2
+</span></span></code></pre></td></tr></table></div></div><p>按照 Arch Linux ARM 的文档，并结合自己的需求，将分区挂载好：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>mount /dev/sda2 /mnt -o compress-force<span class=o>=</span>zstd
+</span></span><span class=line><span class=cl>mkdir /mnt/boot
+</span></span><span class=line><span class=cl>mount /dev/sda1 /mnt/boot
+</span></span><span class=line><span class=cl>mkdir /mnt/boot/efi
+</span></span><span class=line><span class=cl>mount /dev/sda15 /mnt/boot/efi
+</span></span></code></pre></td></tr></table></div></div><h3 id=安装-arch-linux-arm>安装 Arch Linux ARM</h3><p>与 Arch Linux 的安装过程不同，Arch Linux ARM 提供了一个最小环境的压缩包。</p><p>将其下载并解压到根分区（tmpfs）：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>cd</span> /
+</span></span><span class=line><span class=cl>wget http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz
+</span></span><span class=line><span class=cl><span class=nb>cd</span> /mnt
+</span></span><span class=line><span class=cl>bsdtar -xpf /ArchLinuxARM-aarch64-latest.tar.gz -C /mnt
+</span></span></code></pre></td></tr></table></div></div><p>完成这一步后，安装 Arch Linux ARM 与 Arch Linux 就没有太大的区别了。假如遇到问题，可以直接在 <a href=https://wiki.archlinux.org/>Arch Linux Wiki</a> 检索。</p><p>后续步骤记录：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 生成 fstab</span>
+</span></span><span class=line><span class=cl>genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 切换 chroot 环境并初始化</span>
+</span></span><span class=line><span class=cl>arch-chroot /mnt/
+</span></span><span class=line><span class=cl>pacman-key --init
+</span></span><span class=line><span class=cl>pacman-key --populate archlinuxarm
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 安装必要的软件包</span>
+</span></span><span class=line><span class=cl>pacman -S base base-devel linux linux-firmware btrfs-progs zsh wget git vim
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># EFI boot</span>
+</span></span><span class=line><span class=cl>pacman -Syu grub efibootmgr
+</span></span><span class=line><span class=cl>grub-install --efi-directory<span class=o>=</span>/boot/efi --bootloader-id<span class=o>=</span>GRUB
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># grub config</span>
+</span></span><span class=line><span class=cl>grub-mkconfig -o /boot/grub/grub.cfg
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 更改默认用户名/组为 leesheen，并设置密码</span>
+</span></span><span class=line><span class=cl>groupmod -n leesheen alarm
+</span></span><span class=line><span class=cl>usermod -d /home/leesheen -l leesheen -m -c leesheen alarm
+</span></span><span class=line><span class=cl>passwd leesheen
+</span></span><span class=line><span class=cl>usermod -aG wheel leesheen
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># modify /etc/sudoer</span>
+</span></span><span class=line><span class=cl>pacman -S sudo
+</span></span><span class=line><span class=cl>vi /etc/sudoer
+</span></span><span class=line><span class=cl><span class=c1># 解注释 %wheel ALL=(ALL) ALL</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># sshd 配置</span>
+</span></span><span class=line><span class=cl>vi /etc/ssh/sshd_config 
+</span></span><span class=line><span class=cl><span class=c1># 配置安全：关闭 ssh 密码登陆，解注释配置 &#34;PasswordAuthentication no&#34;</span>
+</span></span><span class=line><span class=cl><span class=c1># 配置sshd 不断开，解注释配置 &#34;ClientAliveInterval 60&#34; 和 &#34;ClientAliveCountMax 3&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 添加 ssh key</span>
+</span></span><span class=line><span class=cl>su leesheen
+</span></span><span class=line><span class=cl>mkdir ~/.ssh
+</span></span><span class=line><span class=cl>vim ~/.ssh/authorized_keys
+</span></span><span class=line><span class=cl><span class=c1># 添加公钥</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 设置 root 用户密码</span>
+</span></span><span class=line><span class=cl>passwd
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>exit</span> <span class=c1># leesheen</span>
+</span></span><span class=line><span class=cl><span class=nb>exit</span> <span class=c1># chroot</span>
+</span></span><span class=line><span class=cl>umount -R /mnt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>reboot
+</span></span></code></pre></td></tr></table></div></div><h3 id=进一步配置>进一步配置</h3><p>安装完成后，重启机器。在拥有私钥的机器上直接 ssh，即可进入系统了。</p><p><a href=https://leesheen.github.io/post/InstallArchLinux/>在 2018 年写过一篇安装 Arch Linux 的文章</a>，里面有详细的步骤，这里就不赘述了。</p><p>yay 在 Arch Linux ARM 上的安装，需要编译源码：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 安装 yay</span>
+</span></span><span class=line><span class=cl>git clone https://aur.archlinux.org/yay.git
+</span></span><span class=line><span class=cl><span class=nb>cd</span> yay
+</span></span><span class=line><span class=cl>makepkg -si
+</span></span></code></pre></td></tr></table></div></div><p>按照 Arch Linux 推荐，修改 Linux 部分参数：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># /etc/sysctl.d/10-network.conf
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>net.core.netdev_max_backlog = 16384
+</span></span><span class=line><span class=cl>net.core.somaxconn = 8192
+</span></span><span class=line><span class=cl>net.core.rmem_default = 1048576
+</span></span><span class=line><span class=cl>net.core.rmem_max = 16777216
+</span></span><span class=line><span class=cl>net.core.wmem_default = 1048576
+</span></span><span class=line><span class=cl>net.core.wmem_max = 16777216
+</span></span><span class=line><span class=cl>net.core.optmem_max = 65536
+</span></span><span class=line><span class=cl>net.ipv4.tcp_rmem = 4096 1048576 2097152
+</span></span><span class=line><span class=cl>net.ipv4.tcp_wmem = 4096 65536 16777216
+</span></span><span class=line><span class=cl>net.ipv4.udp_rmem_min = 8192
+</span></span><span class=line><span class=cl>net.ipv4.udp_wmem_min = 8192
+</span></span><span class=line><span class=cl>net.ipv4.tcp_fastopen = 3
+</span></span><span class=line><span class=cl>net.ipv4.tcp_max_syn_backlog = 8192
+</span></span><span class=line><span class=cl>net.ipv4.tcp_max_tw_buckets = 2000000
+</span></span><span class=line><span class=cl>net.ipv4.tcp_tw_reuse = 1
+</span></span><span class=line><span class=cl>net.ipv4.tcp_fin_timeout = 10
+</span></span><span class=line><span class=cl>net.ipv4.tcp_slow_start_after_idle = 0
+</span></span><span class=line><span class=cl>net.ipv4.tcp_keepalive_time = 60
+</span></span><span class=line><span class=cl>net.ipv4.tcp_keepalive_intvl = 10
+</span></span><span class=line><span class=cl>net.ipv4.tcp_keepalive_probes = 6
+</span></span><span class=line><span class=cl>net.ipv4.tcp_mtu_probing = 1
+</span></span><span class=line><span class=cl>net.ipv4.tcp_timestamps = 0
+</span></span><span class=line><span class=cl>net.core.default_qdisc = cake
+</span></span><span class=line><span class=cl>net.ipv4.tcp_congestion_control = bbr
+</span></span><span class=line><span class=cl>net.ipv4.ip_local_port_range = 30000 65535
+</span></span><span class=line><span class=cl># net.ipv4.tcp_syncookies = 1
+</span></span><span class=line><span class=cl># net.ipv4.tcp_rfc1337 = 1
+</span></span><span class=line><span class=cl># net.ipv4.conf.default.log_martians = 1
+</span></span><span class=line><span class=cl># net.ipv4.conf.all.log_martians = 1
+</span></span><span class=line><span class=cl>net.ipv4.conf.all.accept_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv4.conf.default.accept_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv4.conf.all.secure_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv4.conf.default.secure_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv6.conf.all.accept_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv6.conf.default.accept_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv4.conf.all.send_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv4.conf.default.send_redirects = 0
+</span></span><span class=line><span class=cl>net.ipv4.icmp_echo_ignore_all = 1
+</span></span><span class=line><span class=cl>net.ipv6.icmp.echo_ignore_all = 1
+</span></span><span class=line><span class=cl># net.ipv4.ping_group_range = 100 100
+</span></span><span class=line><span class=cl># net.ipv4.ping_group_range = 0 65535
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># /etc/sysctl.d/20-vm.conf
+</span></span><span class=line><span class=cl>vm.dirty_ratio = 10
+</span></span><span class=line><span class=cl>vm.dirty_background_ratio = 5
+</span></span><span class=line><span class=cl>vm.vfs_cache_pressure = 50
+</span></span><span class=line><span class=cl>vm.dirty_background_bytes = 4194304
+</span></span><span class=line><span class=cl>vm.dirty_bytes = 4194304
+</span></span><span class=line><span class=cl>vm.page-cluster = 0
+</span></span></code></pre></td></tr></table></div></div><h3 id=备份>备份</h3><p>到此为止，Arch Linux ARM 安装就差不多完成了。</p><p>清理无用的文件，使用 btrfs 快照功能做一个备份：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 清理pacman</span>
+</span></span><span class=line><span class=cl>pacman -Scc
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># btrfs 备份（只读快照）</span>
+</span></span><span class=line><span class=cl>sudo mkdir /.snapshots
+</span></span><span class=line><span class=cl>sudo btrfs subvolume snapshot -r / /.snapshots/root_20220406
+</span></span></code></pre></td></tr></table></div></div><h1 id=总结>总结</h1><p>netboot.xyz 不仅帮助我在 VPS 上，按照自己的需求安装了 Arch Linux ARM，它的存在不再让我担心系统被搞挂，可以安心的在 VPS 上做内核测试了。</p><h2 id=关于压缩>关于压缩</h2><h3 id=btrfs>btrfs</h3><p>做这件事情的初衷，是需要在安装前启用 btrfs 的压缩功能（不然就直接用 dd 脚本了）。</p><p>使用 <code>-o compress=zstd</code> ，会默认使用 <code>level=3</code> 的压缩比。效果如何？下载并编译 Linux 内核代码，测试看看。</p><p>使用 <code>du -sh ~/Workdir/linux-kernel</code> 看到编译完，Linux 内核目录占用的空间是 22G。</p><p>使用 <code>compsize -x ~/Workdir/linux-kernel</code>，看看具体的压缩情况：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Processed 167289 files, 406612 regular extents (407509 refs), 69022 inline.
+</span></span><span class=line><span class=cl>Type       Perc     Disk Usage   Uncompressed Referenced
+</span></span><span class=line><span class=cl>TOTAL       41%      8.8G          21G          20G
+</span></span><span class=line><span class=cl>none       100%      2.3G         2.3G         2.2G
+</span></span><span class=line><span class=cl>zstd        34%      6.5G          18G          18G
+</span></span></code></pre></td></tr></table></div></div><p>原本总计需要占用 22G 左右的空间，压缩后只占了 8.8G，压缩比为 41%，<strong>节省了一半多的空间</strong>。</p><p>其中绝大部分的文件（18G）是可以压缩的，压缩比为 34%。</p><p>不能压缩的 2.3G 应该是 git 的元数据，因为这些文件已经被 git 压缩过了。确认下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># compsize -x ~/Workdir/linux-kernel/.git/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Processed 71 files, 7727 regular extents (7727 refs), 56 inline.
+</span></span><span class=line><span class=cl>Type       Perc     Disk Usage   Uncompressed Referenced
+</span></span><span class=line><span class=cl>TOTAL       97%      2.4G         2.4G         2.4G
+</span></span><span class=line><span class=cl>none       100%      2.0G         2.0G         2.0G
+</span></span><span class=line><span class=cl>zstd        86%      357M         414M         414M
+</span></span></code></pre></td></tr></table></div></div><p>对于磁盘比较紧张，且磁盘性能不强的设备，使用 btrfs 还是有必要的。如果担心性能问题，也可以使用其他的压缩算法替换，比如 <code>lz4</code>。</p><h3 id=zram>zRAM</h3><p>类似空间紧张的问题，也会出现在内存上。可以使用 zRAM 压缩内存（原理参考 swap）。</p><p>使用 AUR <code>zramd</code> 这个包来管理 zRAM。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>yay -S zramd
+</span></span></code></pre></td></tr></table></div></div><p>在内存比较大的机器上（比如 Oracle Cloud ARM 4core 24G 内存），我选择了 <code>lz4</code> 压缩算法，内存比较小的机器（比如轻量服务器 4core 4G 内存），我选择了压缩比更大的 <code>zstd</code> 压缩算法。大小都配置为物理内存的一半。</p><p>可以按需修改配置文件 <code>/etc/default/zramd</code>。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># See available algorithms by running &#34;cat /sys/block/zramX/comp_algorithm&#34;
+</span></span><span class=line><span class=cl>ALGORITHM=zstd
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># Max fraction of physical memory to use
+</span></span><span class=line><span class=cl>FRACTION=0.5
+</span></span></code></pre></td></tr></table></div></div><p>完成配置文件更新后，启动 zramd。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>systemctl <span class=nb>enable</span> --now zramd
+</span></span></code></pre></td></tr></table></div></div><p>使用 <code>zramctl</code> 查看状态。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>NAME       ALGORITHM DISKSIZE DATA COMPR TOTAL STREAMS MOUNTPOINT
+</span></span><span class=line><span class=cl>/dev/zram0 zstd          1.9G   4K   59B    4K       4 [SWAP]
+</span></span></code></pre></td></tr></table></div></div><p>使用 zRAM 作为 swap 后，<code>vm.page-cluster</code> 也需要修改为 0。详情可以参考<a href=https://www.reddit.com/r/Fedora/comments/mzun99/new_zram_tuning_benchmarks/>这篇文章</a>。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>文章作者</span>
+<span class=item-content>Lee Sheen</span></p><p class=copyright-item><span class=item-title>上次更新</span>
+<span class=item-content>2022-04-06</span></p><p class=copyright-item><span class=item-title>许可协议</span>
+<span class=item-content><a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/><img alt=知识共享许可协议 style=border-width:0 src=https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png></a></span></p></div><footer class=post-footer><nav class=post-nav><a class=prev href=/2022/04/trytousekfence/><i class="iconfont icon-left"></i>
+<span class="prev-text nav-default">使用 KUnit 体验 KFENCE</span>
+<span class="prev-text nav-mobile">上一篇</span></a>
+<a class=next href=/2022/03/amongthestans/><span class="next-text nav-default">《失落的卫星》</span>
+<span class="next-text nav-mobile">下一篇</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><script src=https://utteranc.es/client.js repo=leesheen/leesheen.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script><noscript>Please enable JavaScript to view the <a href=https://github.com/utterance>comments powered by utterances.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=mailto:lixin.engr@gmail.com class="iconfont icon-email" title=email></a>
+<a href=https://github.com/leesheen class="iconfont icon-github" title=github></a>
+<a href=https://twitter.com/Lee_Sheen class="iconfont icon-twitter" title=twitter></a>
+<a href=https://linuxoops.com/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span>Concept Teach Review Simplify</span>
+<span class=copyright-year>&copy;
+2018 -
+2022<span class=heart><i class="iconfont icon-heart"></i></span><span>Lee Sheen</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script>
+<script type=text/javascript src=/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-226953304-2","auto"),ga("set","anonymizeIp",!0),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>

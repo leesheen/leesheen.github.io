@@ -1,0 +1,218 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>批量转换 WebP - Lee Sheen ｜ 践行 Feynman 学习法的地方</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="Lee Sheen"><meta name=description content=" "><meta name=keywords content="Lee Sheen,leesheen,Linux,Kernel"><meta name=baidu-site-verification content="code-kIq1G2u3vq"><meta name=google-site-verification content="yZJn3Yy1q3xGzXdse0wIpVrV7OQ6sh6lch08sWU0ZIM"><meta name=generator content="Hugo 0.99.1 with theme even"><link rel=canonical href=https://linuxoops.com/2022/03/webp/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.b874a8796a492f0d7c86bb24c33cbf052935783a5778ebaf819a8e514bf49f10.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="批量转换 WebP"><meta property="og:description" content=" "><meta property="og:type" content="article"><meta property="og:url" content="https://linuxoops.com/2022/03/webp/"><meta property="article:section" content="post"><meta property="article:published_time" content="2022-03-01T18:02:38+08:00"><meta property="article:modified_time" content="2022-03-01T18:02:38+08:00"><meta itemprop=name content="批量转换 WebP"><meta itemprop=description content=" "><meta itemprop=datePublished content="2022-03-01T18:02:38+08:00"><meta itemprop=dateModified content="2022-03-01T18:02:38+08:00"><meta itemprop=wordCount content="1180"><meta itemprop=keywords content="Mac,Blog,"><meta name=twitter:card content="summary"><meta name=twitter:title content="批量转换 WebP"><meta name=twitter:description content=" "><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>Lee Sheen</a></div><div class=mobile-navbar-icon><span></span>
+<span></span>
+<span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>最近更新</li></a><a href=/post/><li class=mobile-menu-item>归档</li></a><a href=/tags/><li class=mobile-menu-item>标签</li></a><a href=/categories/><li class=mobile-menu-item>分类</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>Lee Sheen</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>最近更新</a></li><li class=menu-item><a class=menu-item-link href=/post/>归档</a></li><li class=menu-item><a class=menu-item-link href=/tags/>标签</a></li><li class=menu-item><a class=menu-item-link href=/categories/>分类</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>批量转换 WebP</h1><div class=post-meta><span class=post-time>2022-03-01</span><div class=post-category><a href=/categories/%E6%8A%80%E6%9C%AF/>技术</a></div><span class=more-meta>约 1180 字</span>
+<span class=more-meta>预计阅读 3 分钟</span></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>文章目录</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#背景>背景</a></li><li><a href=#google-官方工具>Google 官方工具</a><ul><li><a href=#安装>安装</a></li><li><a href=#转换>转换</a></li><li><a href=#配置参数>配置参数</a></li></ul></li><li><a href=#批量转换>批量转换</a><ul><li><a href=#xargs--i>xargs -I</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><blockquote><p>竟然 Google 不到免费又好用的 WebP 转换工具？既然 Google 推广 WebP，一定会有的！</p></blockquote><h2 id=背景>背景</h2><p>前些时间域名到期了没有续费，Word Press 的博客就不再更新了。最近把之前的文章迁移到了 GitHub Pages，想把图片转换为 WebP 的格式，提高访问速度。Google 了半天，发现 Mac 图形界面工具大都是付费产品。</p><h2 id=google-官方工具>Google 官方工具</h2><p><a href=https://developers.google.com/speed/webp/>cwebp</a> 是 Google 官方的开源命令后工具，支持将 PNG、JPEG 等格式的图片转换为 WebP。</p><h3 id=安装>安装</h3><p>在 Mac 下，可以使用 <code>brew install webp</code> 安装。</p><h3 id=转换>转换</h3><p>转换的方式也很简单，使用默认配置：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>cwebp temp.png -o temp.webp
+</span></span></code></pre></td></tr></table></div></div><p>输出结果：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Saving file &#39;temp.webp&#39;
+</span></span><span class=line><span class=cl>File:      temp.png
+</span></span><span class=line><span class=cl>Dimension: 1524 x 1278 (with alpha)
+</span></span><span class=line><span class=cl>Output:    63686 bytes Y-U-V-All-PSNR 49.33 55.07 55.96   50.59 dB
+</span></span><span class=line><span class=cl>           (0.26 bpp)
+</span></span><span class=line><span class=cl>block count:  intra4:        566  (7.37%)
+</span></span><span class=line><span class=cl>              intra16:      7114  (92.63%)
+</span></span><span class=line><span class=cl>              skipped:      7018  (91.38%)
+</span></span><span class=line><span class=cl>bytes used:  header:            325  (0.5%)
+</span></span><span class=line><span class=cl>             mode-partition:   5674  (8.9%)
+</span></span><span class=line><span class=cl>             transparency:    39119 (99.0 dB)
+</span></span><span class=line><span class=cl> Residuals bytes  |segment 1|segment 2|segment 3|segment 4|  total
+</span></span><span class=line><span class=cl>    macroblocks:  |       1%|       1%|      10%|      88%|    7680
+</span></span><span class=line><span class=cl>      quantizer:  |      36 |      36 |      30 |      25 |
+</span></span><span class=line><span class=cl>   filter level:  |      11 |       8 |       5 |       4 |
+</span></span><span class=line><span class=cl>Lossless-alpha compressed size: 39118 bytes
+</span></span><span class=line><span class=cl>  * Header size: 361 bytes, image data size: 38757
+</span></span><span class=line><span class=cl>  * Precision Bits: histogram=5 transform=5 cache=0
+</span></span><span class=line><span class=cl>  * Palette size:   129
+</span></span></code></pre></td></tr></table></div></div><p>上述是使用 Mac 部分截图功能生成的图片，转换后文件大小从 363K 减小到 62K，压缩比非常可观。</p><h3 id=配置参数>配置参数</h3><p>使用 <code>cwebp --help</code> 可以看到 <code>cwebp</code> 所有支持的参数，这里就不展开了，需要的时候都可以 Google 到例子。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Usage:
+</span></span><span class=line><span class=cl> cwebp [-preset &lt;...&gt;] [options] in_file [-o out_file]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>If input size (-s) for an image is not specified, it is
+</span></span><span class=line><span class=cl>assumed to be a PNG, JPEG, TIFF or WebP file.
+</span></span><span class=line><span class=cl>Note: Animated PNG and WebP files are not supported.
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Options:
+</span></span><span class=line><span class=cl>  -h / -help ............. short help
+</span></span><span class=line><span class=cl>  -H / -longhelp ......... long help
+</span></span><span class=line><span class=cl>  -q &lt;float&gt; ............. quality factor (0:small..100:big), default=75
+</span></span><span class=line><span class=cl>  -alpha_q &lt;int&gt; ......... transparency-compression quality (0..100),
+</span></span><span class=line><span class=cl>                           default=100
+</span></span><span class=line><span class=cl>  -preset &lt;string&gt; ....... preset setting, one of:
+</span></span><span class=line><span class=cl>                            default, photo, picture,
+</span></span><span class=line><span class=cl>                            drawing, icon, text
+</span></span><span class=line><span class=cl>     -preset must come first, as it overwrites other parameters
+</span></span><span class=line><span class=cl>  -z &lt;int&gt; ............... activates lossless preset with given
+</span></span><span class=line><span class=cl>                           level in [0:fast, ..., 9:slowest]
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  -m &lt;int&gt; ............... compression method (0=fast, 6=slowest), default=4
+</span></span><span class=line><span class=cl>  -segments &lt;int&gt; ........ number of segments to use (1..4), default=4
+</span></span><span class=line><span class=cl>  -size &lt;int&gt; ............ target size (in bytes)
+</span></span><span class=line><span class=cl>  -psnr &lt;float&gt; .......... target PSNR (in dB. typically: 42)
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  -s &lt;int&gt; &lt;int&gt; ......... input size (width x height) for YUV
+</span></span><span class=line><span class=cl>  -sns &lt;int&gt; ............. spatial noise shaping (0:off, 100:max), default=50
+</span></span><span class=line><span class=cl>  -f &lt;int&gt; ............... filter strength (0=off..100), default=60
+</span></span><span class=line><span class=cl>  -sharpness &lt;int&gt; ....... filter sharpness (0:most .. 7:least sharp), default=0
+</span></span><span class=line><span class=cl>  -strong ................ use strong filter instead of simple (default)
+</span></span><span class=line><span class=cl>  -nostrong .............. use simple filter instead of strong
+</span></span><span class=line><span class=cl>  -sharp_yuv ............. use sharper (and slower) RGB-&gt;YUV conversion
+</span></span><span class=line><span class=cl>  -partition_limit &lt;int&gt; . limit quality to fit the 512k limit on
+</span></span><span class=line><span class=cl>                           the first partition (0=no degradation ... 100=full)
+</span></span><span class=line><span class=cl>  -pass &lt;int&gt; ............ analysis pass number (1..10)
+</span></span><span class=line><span class=cl>  -qrange &lt;min&gt; &lt;max&gt; .... specifies the permissible quality range
+</span></span><span class=line><span class=cl>                           (default: 0 100)
+</span></span><span class=line><span class=cl>  -crop &lt;x&gt; &lt;y&gt; &lt;w&gt; &lt;h&gt; .. crop picture with the given rectangle
+</span></span><span class=line><span class=cl>  -resize &lt;w&gt; &lt;h&gt; ........ resize picture (after any cropping)
+</span></span><span class=line><span class=cl>  -mt .................... use multi-threading if available
+</span></span><span class=line><span class=cl>  -low_memory ............ reduce memory usage (slower encoding)
+</span></span><span class=line><span class=cl>  -map &lt;int&gt; ............. print map of extra info
+</span></span><span class=line><span class=cl>  -print_psnr ............ prints averaged PSNR distortion
+</span></span><span class=line><span class=cl>  -print_ssim ............ prints averaged SSIM distortion
+</span></span><span class=line><span class=cl>  -print_lsim ............ prints local-similarity distortion
+</span></span><span class=line><span class=cl>  -d &lt;file.pgm&gt; .......... dump the compressed output (PGM file)
+</span></span><span class=line><span class=cl>  -alpha_method &lt;int&gt; .... transparency-compression method (0..1), default=1
+</span></span><span class=line><span class=cl>  -alpha_filter &lt;string&gt; . predictive filtering for alpha plane,
+</span></span><span class=line><span class=cl>                           one of: none, fast (default) or best
+</span></span><span class=line><span class=cl>  -exact ................. preserve RGB values in transparent area, default=off
+</span></span><span class=line><span class=cl>  -blend_alpha &lt;hex&gt; ..... blend colors against background color
+</span></span><span class=line><span class=cl>                           expressed as RGB values written in
+</span></span><span class=line><span class=cl>                           hexadecimal, e.g. 0xc0e0d0 for red=0xc0
+</span></span><span class=line><span class=cl>                           green=0xe0 and blue=0xd0
+</span></span><span class=line><span class=cl>  -noalpha ............... discard any transparency information
+</span></span><span class=line><span class=cl>  -lossless .............. encode image losslessly, default=off
+</span></span><span class=line><span class=cl>  -near_lossless &lt;int&gt; ... use near-lossless image
+</span></span><span class=line><span class=cl>                           preprocessing (0..100=off), default=100
+</span></span><span class=line><span class=cl>  -hint &lt;string&gt; ......... specify image characteristics hint,
+</span></span><span class=line><span class=cl>                           one of: photo, picture or graph
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  -metadata &lt;string&gt; ..... comma separated list of metadata to
+</span></span><span class=line><span class=cl>                           copy from the input to the output if present.
+</span></span><span class=line><span class=cl>                           Valid values: all, none (default), exif, icc, xmp
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  -short ................. condense printed message
+</span></span><span class=line><span class=cl>  -quiet ................. don&#39;t print anything
+</span></span><span class=line><span class=cl>  -version ............... print version number and exit
+</span></span><span class=line><span class=cl>  -noasm ................. disable all assembly optimizations
+</span></span><span class=line><span class=cl>  -v ..................... verbose, e.g. print encoding/decoding times
+</span></span><span class=line><span class=cl>  -progress .............. report encoding progress
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Experimental Options:
+</span></span><span class=line><span class=cl>  -jpeg_like ............. roughly match expected JPEG size
+</span></span><span class=line><span class=cl>  -af .................... auto-adjust filter strength
+</span></span><span class=line><span class=cl>  -pre &lt;int&gt; ............. pre-processing filter
+</span></span></code></pre></td></tr></table></div></div><h2 id=批量转换>批量转换</h2><p>因为要迁移很多文章，需要批量转换图片。看了半天 help 没找到对批量转换的支持，而且 <code>cwebp</code> 命令必须指定 <code>-o</code> 参数，心想需要上 Shell 脚本了。</p><p><code>xargs</code> 好像也行？又看了下 <code>xargs</code> 的 help，发现了 <code>-I {}</code> 参数的功能合适，<strong>批量转换命令如下</strong>：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>find ./ -name <span class=s1>&#39;*.png&#39;</span> <span class=p>|</span> awk -F <span class=s1>&#39;.png&#39;</span> <span class=s1>&#39;{print $1}&#39;</span> <span class=p>|</span> xargs -I <span class=o>{}</span> cwebp <span class=o>{}</span>.png -o <span class=o>{}</span>.webp
+</span></span></code></pre></td></tr></table></div></div><p>可以按需要定制这行命令。</p><h3 id=xargs--i>xargs -I</h3><p><code>xargs</code> 默认可以接受一个输入。比如 <code>find ./ -name need-touch | touch</code></p><p>当需要使用多次输入的时候，就可以添加 <code>-I {}</code> 参数，然后在后面的命令使用 <code>{}</code> 作为替代符。如前面的批量命令使用的那样。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>文章作者</span>
+<span class=item-content>Lee Sheen</span></p><p class=copyright-item><span class=item-title>上次更新</span>
+<span class=item-content>2022-03-01</span></p><p class=copyright-item><span class=item-title>许可协议</span>
+<span class=item-content><a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/><img alt=知识共享许可协议 style=border-width:0 src=https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png></a></span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/mac/>Mac</a>
+<a href=/tags/blog/>Blog</a></div><nav class=post-nav><a class=prev href=/2022/03/amongthestans/><i class="iconfont icon-left"></i>
+<span class="prev-text nav-default">《失落的卫星》</span>
+<span class="prev-text nav-mobile">上一篇</span></a>
+<a class=next href=/2021/03/silentspring/><span class="next-text nav-default">《寂静的春天》</span>
+<span class="next-text nav-mobile">下一篇</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><script src=https://utteranc.es/client.js repo=leesheen/leesheen.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script><noscript>Please enable JavaScript to view the <a href=https://github.com/utterance>comments powered by utterances.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=mailto:lixin.engr@gmail.com class="iconfont icon-email" title=email></a>
+<a href=https://github.com/leesheen class="iconfont icon-github" title=github></a>
+<a href=https://twitter.com/Lee_Sheen class="iconfont icon-twitter" title=twitter></a>
+<a href=https://linuxoops.com/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span>Concept Teach Review Simplify</span>
+<span class=copyright-year>&copy;
+2018 -
+2022<span class=heart><i class="iconfont icon-heart"></i></span><span>Lee Sheen</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script>
+<script type=text/javascript src=/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-226953304-2","auto"),ga("set","anonymizeIp",!0),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
