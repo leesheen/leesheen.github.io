@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://leesheen.github.io/sitemap.xml

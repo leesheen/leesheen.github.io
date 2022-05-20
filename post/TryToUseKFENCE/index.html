@@ -1,0 +1,880 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>使用 KUnit 体验 KFENCE - Lee Sheen ｜ 践行 Feynman 学习法的地方</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="Lee Sheen"><meta name=description content=" "><meta name=keywords content="Lee Sheen,leesheen,Linux,Kernel"><meta name=google-site-verification content="R8TWP3APKMZYoldmneq0ofw6zEVVBIgs5Yv8SiivZ9o"><meta name=generator content="Hugo 0.99.1 with theme even"><link rel=canonical href=https://leesheen.github.io/post/TryToUseKFENCE/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.b874a8796a492f0d7c86bb24c33cbf052935783a5778ebaf819a8e514bf49f10.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="使用 KUnit 体验 KFENCE"><meta property="og:description" content=" "><meta property="og:type" content="article"><meta property="og:url" content="https://leesheen.github.io/post/TryToUseKFENCE/"><meta property="article:section" content="post"><meta property="article:published_time" content="2022-04-21T19:03:37+08:00"><meta property="article:modified_time" content="2022-04-21T19:03:37+08:00"><meta itemprop=name content="使用 KUnit 体验 KFENCE"><meta itemprop=description content=" "><meta itemprop=datePublished content="2022-04-21T19:03:37+08:00"><meta itemprop=dateModified content="2022-04-21T19:03:37+08:00"><meta itemprop=wordCount content="3759"><meta itemprop=keywords content="Linux,Kernel,"><meta name=twitter:card content="summary"><meta name=twitter:title content="使用 KUnit 体验 KFENCE"><meta name=twitter:description content=" "><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>Lee Sheen</a></div><div class=mobile-navbar-icon><span></span>
+<span></span>
+<span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>最近更新</li></a><a href=/post/><li class=mobile-menu-item>归档</li></a><a href=/tags/><li class=mobile-menu-item>标签</li></a><a href=/categories/><li class=mobile-menu-item>分类</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>Lee Sheen</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>最近更新</a></li><li class=menu-item><a class=menu-item-link href=/post/>归档</a></li><li class=menu-item><a class=menu-item-link href=/tags/>标签</a></li><li class=menu-item><a class=menu-item-link href=/categories/>分类</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>使用 KUnit 体验 KFENCE</h1><div class=post-meta><span class=post-time>2022-04-21</span><div class=post-category><a href=/categories/%E6%8A%80%E6%9C%AF/>技术</a></div><span class=more-meta>约 3759 字</span>
+<span class=more-meta>预计阅读 8 分钟</span></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>文章目录</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#概念>概念</a><ul><li><a href=#kfence>KFENCE</a></li><li><a href=#kunit>KUnit</a></li></ul></li><li><a href=#过程>过程</a><ul><li><a href=#初始化-kunit>初始化 KUnit</a></li><li><a href=#kunit-配置文件>KUnit 配置文件</a></li><li><a href=#运行-kunit>运行 KUnit</a></li><li><a href=#添加-kfence-到-kunit-配置文件中>添加 KFENCE 到 KUnit 配置文件中</a></li><li><a href=#排查依赖>排查依赖</a></li><li><a href=#kfence-测试用例没有执行>KFENCE 测试用例没有执行？</a></li></ul></li><li><a href=#内核错误解读>内核错误解读</a><ul><li><a href=#invalid-free>invalid free</a></li><li><a href=#out-of-bounds>out-of-bounds</a></li><li><a href=#use-after-free>use-after-free</a></li><li><a href=#memory-corruption>memory corruption</a></li></ul></li><li><a href=#总结>总结</a></li></ul></li></ul></nav></div></div><div class=post-content><blockquote><p>2022 上半年，在很多 Kernel 技术社区都听到了 KFENCE 特性。Google 出的相关文章大多是介绍原理，没有看到实践案例。在翻代码的过程中，发现 KFENCE 使用了 KUnit 写了测试用例。所以希望通过运行测试用例的方式体验下 KFENCE。</p></blockquote><h2 id=概念>概念</h2><h3 id=kfence>KFENCE</h3><p><a href=https://docs.kernel.org/dev-tools/kfence.html#>KFENCE</a> ，全称 Kernel Electric-Fence。在 <a href=https://lwn.net/Articles/835542/>Linux 5.12 引入 Upstream</a>，是一种基于低开销采样的内存安全错误检测器。 KFENCE 检测可以检测 heap out-of-bounds access、use-after-free 和 invalid-free 等错误。</p><p>而功能与其相似的 <a href=https://www.kernel.org/doc/html/v4.14/dev-tools/kasan.html>KASAN</a> ，通过编译时插桩，并检查每个内存访问，准确性更好，但会产生性能影响，并带来额外的内存开销。可以在非生产环境排查问题使用。而 KFENCE 基于采样实现，其性能开销几乎为零。设计初衷是希望在生产环境启用，两者可为互补。</p><h3 id=kunit>KUnit</h3><p><a href=https://www.kernel.org/doc/html/latest/dev-tools/kunit/index.html>KUnit</a>，全称 Kernel unit testing framework，在 <a href=https://lwn.net/Articles/780985/>Linux 5.5 引入 Upstream</a>。KUnit 为 Linux 内核中的单元测试提供了一个通用框架。</p><p>KUnit 测试是内核的一部分，使用 C 语言编写。KUnit 可以测试任何内核组件，效率也很高。它使用 Linux 内核源码脚本 <code>tools/testing/kunit/kunit.py</code>，可以在 QEMU 或 UML 下运行 KUnit 测试，并提供可读性高的结果。</p><h2 id=过程>过程</h2><p>开发环境：Arch Linux，Source Code：Linux 5.17.3，GCC：gcc version 11.2.0</p><h3 id=初始化-kunit>初始化 KUnit</h3><p>KUnit 与 Linux 内核具有相同的依赖关系。所以只要你能构建内核，你就可以运行 KUnit。</p><p>在内核代码目录，可以通过 <code>./tools/testing/kunit/kunit.py config</code> 生成 KUnit 的默认配置。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># ./tools/testing/kunit/kunit.py config
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[13:43:28] Configuring KUnit Kernel ...
+</span></span><span class=line><span class=cl>Generating .config ...
+</span></span><span class=line><span class=cl>Populating config with:
+</span></span><span class=line><span class=cl>$ make ARCH=um olddefconfig O=.kunit
+</span></span><span class=line><span class=cl>[13:43:32] Elapsed time: 4.157s
+</span></span></code></pre></td></tr></table></div></div><p>配置成功后，KUnit 会在代码目录下生成<code>.kunit</code> 的新目录，单独存放与 KUnit 相关的文件。</p><p>在不修改默认配置的前提下，所有与 KUnit 相关的配置文件、过程文件（例如 KUnit 编译的 *.o）和目标文件，都会存在在该目录下。<strong>并不会影响内核的配置和编译文件</strong>。</p><p>下面展示了一个已经<strong>使用 KUnit 完成测试后</strong>，<code>.kunit</code> 下的全部内容。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># ls -a .kunit
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>.                      linux                      test.log
+</span></span><span class=line><span class=cl>..                     Makefile                   .tmp_System.map
+</span></span><span class=line><span class=cl>arch                   .missing-syscalls.d        .tmp_vmlinux.kallsyms1
+</span></span><span class=line><span class=cl>block                  mm                         .tmp_vmlinux.kallsyms1.o
+</span></span><span class=line><span class=cl>certs                  modules.builtin            .tmp_vmlinux.kallsyms1.S
+</span></span><span class=line><span class=cl>.config                modules.builtin.modinfo    .tmp_vmlinux.kallsyms2
+</span></span><span class=line><span class=cl>.config.old            modules-only.symvers       .tmp_vmlinux.kallsyms2.o
+</span></span><span class=line><span class=cl>crypto                 .modules-only.symvers.cmd  .tmp_vmlinux.kallsyms2.S
+</span></span><span class=line><span class=cl>drivers                modules.order              tools
+</span></span><span class=line><span class=cl>fs                     .modules.order.cmd         usr
+</span></span><span class=line><span class=cl>.gitignore             Module.symvers             .version
+</span></span><span class=line><span class=cl>include                .Module.symvers.cmd        virt
+</span></span><span class=line><span class=cl>init                   net                        vmlinux
+</span></span><span class=line><span class=cl>ipc                    scripts                    .vmlinux.cmd
+</span></span><span class=line><span class=cl>kernel                 security                   vmlinux.o
+</span></span><span class=line><span class=cl>.kunitconfig           sound                      vmlinux.symvers
+</span></span><span class=line><span class=cl>last_used_kunitconfig  source
+</span></span><span class=line><span class=cl>lib                    System.map
+</span></span></code></pre></td></tr></table></div></div><h3 id=kunit-配置文件>KUnit 配置文件</h3><p>在 <code>.kunit</code> 下，存在两个我们需要关注的文件：<code>.kunit/.config</code> 和 <code>.kunit/.kunitconfig</code>。</p><p><code>.kunit/.config</code> 与内核源码下的 <code>.config</code> 功能相同，展示所有已经选中的配置。在 KUnit中，需要使用 <code>.kunit/.kunitconfig</code> 间接生成<code>.kunit/.config</code>。</p><p>默认的 <code>.kunit/.kunitconfig</code> 拷贝自 <code>tools/testing/kunit/configs/default.config</code>，内容非常简单：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>CONFIG_KUNIT=y
+</span></span><span class=line><span class=cl>CONFIG_KUNIT_EXAMPLE_TEST=y
+</span></span><span class=line><span class=cl>CONFIG_KUNIT_ALL_TESTS=y
+</span></span></code></pre></td></tr></table></div></div><h3 id=运行-kunit>运行 KUnit</h3><p>完成配置后，就可以执行 <code>./tools/testing/kunit/kunit.py run</code> 运行 KUnit 测试用例了。</p><p>需要等待一点编译的时间。测试结果如下所示：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>  1
+</span><span class=lnt>  2
+</span><span class=lnt>  3
+</span><span class=lnt>  4
+</span><span class=lnt>  5
+</span><span class=lnt>  6
+</span><span class=lnt>  7
+</span><span class=lnt>  8
+</span><span class=lnt>  9
+</span><span class=lnt> 10
+</span><span class=lnt> 11
+</span><span class=lnt> 12
+</span><span class=lnt> 13
+</span><span class=lnt> 14
+</span><span class=lnt> 15
+</span><span class=lnt> 16
+</span><span class=lnt> 17
+</span><span class=lnt> 18
+</span><span class=lnt> 19
+</span><span class=lnt> 20
+</span><span class=lnt> 21
+</span><span class=lnt> 22
+</span><span class=lnt> 23
+</span><span class=lnt> 24
+</span><span class=lnt> 25
+</span><span class=lnt> 26
+</span><span class=lnt> 27
+</span><span class=lnt> 28
+</span><span class=lnt> 29
+</span><span class=lnt> 30
+</span><span class=lnt> 31
+</span><span class=lnt> 32
+</span><span class=lnt> 33
+</span><span class=lnt> 34
+</span><span class=lnt> 35
+</span><span class=lnt> 36
+</span><span class=lnt> 37
+</span><span class=lnt> 38
+</span><span class=lnt> 39
+</span><span class=lnt> 40
+</span><span class=lnt> 41
+</span><span class=lnt> 42
+</span><span class=lnt> 43
+</span><span class=lnt> 44
+</span><span class=lnt> 45
+</span><span class=lnt> 46
+</span><span class=lnt> 47
+</span><span class=lnt> 48
+</span><span class=lnt> 49
+</span><span class=lnt> 50
+</span><span class=lnt> 51
+</span><span class=lnt> 52
+</span><span class=lnt> 53
+</span><span class=lnt> 54
+</span><span class=lnt> 55
+</span><span class=lnt> 56
+</span><span class=lnt> 57
+</span><span class=lnt> 58
+</span><span class=lnt> 59
+</span><span class=lnt> 60
+</span><span class=lnt> 61
+</span><span class=lnt> 62
+</span><span class=lnt> 63
+</span><span class=lnt> 64
+</span><span class=lnt> 65
+</span><span class=lnt> 66
+</span><span class=lnt> 67
+</span><span class=lnt> 68
+</span><span class=lnt> 69
+</span><span class=lnt> 70
+</span><span class=lnt> 71
+</span><span class=lnt> 72
+</span><span class=lnt> 73
+</span><span class=lnt> 74
+</span><span class=lnt> 75
+</span><span class=lnt> 76
+</span><span class=lnt> 77
+</span><span class=lnt> 78
+</span><span class=lnt> 79
+</span><span class=lnt> 80
+</span><span class=lnt> 81
+</span><span class=lnt> 82
+</span><span class=lnt> 83
+</span><span class=lnt> 84
+</span><span class=lnt> 85
+</span><span class=lnt> 86
+</span><span class=lnt> 87
+</span><span class=lnt> 88
+</span><span class=lnt> 89
+</span><span class=lnt> 90
+</span><span class=lnt> 91
+</span><span class=lnt> 92
+</span><span class=lnt> 93
+</span><span class=lnt> 94
+</span><span class=lnt> 95
+</span><span class=lnt> 96
+</span><span class=lnt> 97
+</span><span class=lnt> 98
+</span><span class=lnt> 99
+</span><span class=lnt>100
+</span><span class=lnt>101
+</span><span class=lnt>102
+</span><span class=lnt>103
+</span><span class=lnt>104
+</span><span class=lnt>105
+</span><span class=lnt>106
+</span><span class=lnt>107
+</span><span class=lnt>108
+</span><span class=lnt>109
+</span><span class=lnt>110
+</span><span class=lnt>111
+</span><span class=lnt>112
+</span><span class=lnt>113
+</span><span class=lnt>114
+</span><span class=lnt>115
+</span><span class=lnt>116
+</span><span class=lnt>117
+</span><span class=lnt>118
+</span><span class=lnt>119
+</span><span class=lnt>120
+</span><span class=lnt>121
+</span><span class=lnt>122
+</span><span class=lnt>123
+</span><span class=lnt>124
+</span><span class=lnt>125
+</span><span class=lnt>126
+</span><span class=lnt>127
+</span><span class=lnt>128
+</span><span class=lnt>129
+</span><span class=lnt>130
+</span><span class=lnt>131
+</span><span class=lnt>132
+</span><span class=lnt>133
+</span><span class=lnt>134
+</span><span class=lnt>135
+</span><span class=lnt>136
+</span><span class=lnt>137
+</span><span class=lnt>138
+</span><span class=lnt>139
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># ./tools/testing/kunit/kunit.py run
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[14:09:26] Configuring KUnit Kernel ...
+</span></span><span class=line><span class=cl>[14:09:26] Building KUnit Kernel ...
+</span></span><span class=line><span class=cl>Populating config with:
+</span></span><span class=line><span class=cl>$ make ARCH=um olddefconfig O=.kunit
+</span></span><span class=line><span class=cl>Building with:
+</span></span><span class=line><span class=cl>$ make ARCH=um --jobs=4 O=.kunit
+</span></span><span class=line><span class=cl>[14:11:00] Starting KUnit Kernel (1/1)...
+</span></span><span class=line><span class=cl>[14:11:00] ============================================================
+</span></span><span class=line><span class=cl>[14:11:02] =============== time_test_cases (1 subtest) ================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] time64_to_tm_test_date_range
+</span></span><span class=line><span class=cl>[14:11:02] ================= [PASSED] time_test_cases =================
+</span></span><span class=line><span class=cl>[14:11:02] ================ sysctl_test (10 subtests) =================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_api_dointvec_null_tbl_data
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_api_dointvec_table_maxlen_unset
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_api_dointvec_table_len_is_zero
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_api_dointvec_table_read_but_position_set
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_dointvec_read_happy_single_positive
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_dointvec_read_happy_single_negative
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_dointvec_write_happy_single_positive
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_dointvec_write_happy_single_negative
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_api_dointvec_write_single_less_int_min
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] sysctl_test_api_dointvec_write_single_greater_int_max
+</span></span><span class=line><span class=cl>[14:11:02] =================== [PASSED] sysctl_test ===================
+</span></span><span class=line><span class=cl>[14:11:02] ==================== hash (2 subtests) =====================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_string_or
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_hash_or
+</span></span><span class=line><span class=cl>[14:11:02] ====================== [PASSED] hash =======================
+</span></span><span class=line><span class=cl>[14:11:02] ================== list_sort (1 subtest) ===================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_sort_test
+</span></span><span class=line><span class=cl>[14:11:02] ==================== [PASSED] list_sort ====================
+</span></span><span class=line><span class=cl>[14:11:02] =================== lib_sort (1 subtest) ===================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_sort
+</span></span><span class=line><span class=cl>[14:11:02] ==================== [PASSED] lib_sort =====================
+</span></span><span class=line><span class=cl>[14:11:02] ============= kunit_executor_test (5 subtests) =============
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] parse_filter_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] filter_subsuite_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] filter_subsuite_test_glob_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] filter_subsuite_to_empty_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] filter_suites_test
+</span></span><span class=line><span class=cl>[14:11:02] =============== [PASSED] kunit_executor_test ===============
+</span></span><span class=line><span class=cl>[14:11:02] ============ kunit-try-catch-test (2 subtests) =============
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_test_try_catch_successful_try_no_catch
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_test_try_catch_unsuccessful_try_does_catch
+</span></span><span class=line><span class=cl>[14:11:02] ============== [PASSED] kunit-try-catch-test ===============
+</span></span><span class=line><span class=cl>[14:11:02] ============= kunit-resource-test (7 subtests) =============
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_init_resources
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_alloc_resource
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_destroy_resource
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_cleanup_resources
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_proper_free_ordering
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_static
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_resource_test_named
+</span></span><span class=line><span class=cl>[14:11:02] =============== [PASSED] kunit-resource-test ===============
+</span></span><span class=line><span class=cl>[14:11:02] ================ kunit-log-test (1 subtest) ================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_log_test
+</span></span><span class=line><span class=cl>[14:11:02] ================= [PASSED] kunit-log-test ==================
+</span></span><span class=line><span class=cl>[14:11:02] ================ kunit_status (2 subtests) =================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_status_set_failure_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] kunit_status_mark_skipped_test
+</span></span><span class=line><span class=cl>[14:11:02] ================== [PASSED] kunit_status ===================
+</span></span><span class=line><span class=cl>[14:11:02] ============= string-stream-test (3 subtests) ==============
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] string_stream_test_empty_on_creation
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] string_stream_test_not_empty_after_add
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] string_stream_test_get_string
+</span></span><span class=line><span class=cl>[14:11:02] =============== [PASSED] string-stream-test ================
+</span></span><span class=line><span class=cl>[14:11:02] =================== example (3 subtests) ===================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] example_simple_test
+</span></span><span class=line><span class=cl>[14:11:02] [SKIPPED] example_skip_test
+</span></span><span class=line><span class=cl>[14:11:02] [SKIPPED] example_mark_skipped_test
+</span></span><span class=line><span class=cl>[14:11:02] ===================== [PASSED] example =====================
+</span></span><span class=line><span class=cl>[14:11:02] ============== list-kunit-test (36 subtests) ===============
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_init
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_add
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_add_tail
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_del
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_replace
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_replace_init
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_swap
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_del_init
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_move
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_move_tail
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_bulk_move_tail
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_is_first
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_is_last
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_empty
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_empty_careful
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_rotate_left
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_rotate_to_front
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_is_singular
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_cut_position
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_cut_before
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_splice
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_splice_tail
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_splice_init
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_splice_tail_init
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_entry
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_first_entry
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_last_entry
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_first_entry_or_null
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_next_entry
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_prev_entry
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_for_each
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_for_each_prev
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_for_each_safe
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_for_each_prev_safe
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_for_each_entry
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] list_test_list_for_each_entry_reverse
+</span></span><span class=line><span class=cl>[14:11:02] ================= [PASSED] list-kunit-test =================
+</span></span><span class=line><span class=cl>[14:11:02] ================== slub_test (5 subtests) ==================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_clobber_zone
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_next_pointer
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_first_word
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_clobber_50th_byte
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] test_clobber_redzone_free
+</span></span><span class=line><span class=cl>[14:11:02] ==================== [PASSED] slub_test ====================
+</span></span><span class=line><span class=cl>[14:11:02] =================== memcpy (3 subtests) ====================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] memset_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] memcpy_test
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] memmove_test
+</span></span><span class=line><span class=cl>[14:11:02] ===================== [PASSED] memcpy ======================
+</span></span><span class=line><span class=cl>[14:11:02] =============== qos-kunit-test (3 subtests) ================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] freq_qos_test_min
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] freq_qos_test_maxdef
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] freq_qos_test_readd
+</span></span><span class=line><span class=cl>[14:11:02] ================= [PASSED] qos-kunit-test ==================
+</span></span><span class=line><span class=cl>[14:11:02] =============== property-entry (7 subtests) ================
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_uints
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_uint_arrays
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_strings
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_bool
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_move_inline_u8
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_move_inline_str
+</span></span><span class=line><span class=cl>[14:11:02] [PASSED] pe_test_reference
+</span></span><span class=line><span class=cl>[14:11:02] ================= [PASSED] property-entry ==================
+</span></span><span class=line><span class=cl>[14:11:02] ============================================================
+</span></span><span class=line><span class=cl>[14:11:02] Testing complete. Passed: 90, Failed: 0, Crashed: 0, Skipped: 2, Errors: 0
+</span></span><span class=line><span class=cl>[14:11:02] Elapsed time: 96.501s total, 0.001s configuring, 94.280s building, 2.219s running
+</span></span></code></pre></td></tr></table></div></div><p>可以看到所有的测试用例都通过了。</p><h3 id=添加-kfence-到-kunit-配置文件中>添加 KFENCE 到 KUnit 配置文件中</h3><p>虽然我们在配置文件中选择了<code>CONFIG_KUNIT_ALL_TESTS=y</code>，但在上述测试结果中并未发现 KFENCE 的身影。</p><p>通过查看 <code>.kunit/.config </code>文件的内容，我们并没有找到 <code>CONFIG_KFENCE</code> 的配置项，说明默认配置没有打开 KFENCE，所以 KFENCE 的测试用例也没有被执行。</p><p>在内核源码的 Documents 中可以找到开启 KFENCE 需要的内核选项。因为我当前使用的 Arch Linux，内核版本也是 5.17.3，默认打开了 KFENCE，直接通过当前的配置文件，看看 KFENCE 的配置：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># zcat /proc/config.gz | grep -i kfence
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CONFIG_HAVE_ARCH_KFENCE=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_SAMPLE_INTERVAL=100
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_NUM_OBJECTS=255
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_STRESS_TEST_FAULTS=0
+</span></span></code></pre></td></tr></table></div></div><p>就把这些内容和 <code>CONFIG_KFENCE_KUNIT_TEST</code> 一起添加到 <code>.kunit/.kunitconfig</code>中。为了便于查看，把 <code>CONFIG_KUNIT_ALL_TESTS</code> 删除，只保留 KUnit 测试用例和示例：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># cat .kunit/.kunitconfig
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># kfence
+</span></span><span class=line><span class=cl>CONFIG_HAVE_ARCH_KFENCE=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_SAMPLE_INTERVAL=100
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_NUM_OBJECTS=255
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_STRESS_TEST_FAULTS=0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># kunit
+</span></span><span class=line><span class=cl>CONFIG_KUNIT=y
+</span></span><span class=line><span class=cl>CONFIG_KUNIT_EXAMPLE_TEST=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_KUNIT_TEST=y
+</span></span></code></pre></td></tr></table></div></div><p>再使用 <code>./tools/testing/kunit/kunit.py config</code> 生成 KUnit 的配置，发现出错了：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># ./tools/testing/kunit/kunit.py config
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[14:49:37] Configuring KUnit Kernel ...
+</span></span><span class=line><span class=cl>Regenerating .config ...
+</span></span><span class=line><span class=cl>Populating config with:
+</span></span><span class=line><span class=cl>$ make ARCH=um olddefconfig O=.kunit
+</span></span><span class=line><span class=cl>ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
+</span></span><span class=line><span class=cl>This is probably due to unsatisfied dependencies.
+</span></span><span class=line><span class=cl>Missing: CONFIG_KFENCE=y, CONFIG_HAVE_ARCH_KFENCE=y, CONFIG_KFENCE_KUNIT_TEST=y, CONFIG_KFENCE_SAMPLE_INTERVAL=100, CONFIG_KFENCE_NUM_OBJECTS=255, CONFIG_KFENCE_STRESS_TEST_FAULTS=0
+</span></span><span class=line><span class=cl>Note: many Kconfig options aren&#39;t available on UML. You can try running on a different architecture with something like &#34;--arch=x86_64&#34;.
+</span></span><span class=line><span class=cl>[14:49:38] Elapsed time: 1.069s
+</span></span></code></pre></td></tr></table></div></div><p>错误信息描述的比较清楚：</p><ol><li>添加 KFENCE 相关配置缺少依赖，</li><li>添加的配置不支持 UML，需要指定体系结构。</li></ol><p>添加 <code>--arch=x86_64</code> 再尝试下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># ./tools/testing/kunit/kunit.py config --arch=x86_64
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[15:47:42] Configuring KUnit Kernel ...
+</span></span><span class=line><span class=cl>Regenerating .config ...
+</span></span><span class=line><span class=cl>Populating config with:
+</span></span><span class=line><span class=cl>$ make ARCH=x86_64 olddefconfig O=.kunit
+</span></span><span class=line><span class=cl>ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
+</span></span><span class=line><span class=cl>This is probably due to unsatisfied dependencies.
+</span></span><span class=line><span class=cl>Missing: CONFIG_KFENCE_KUNIT_TEST=y
+</span></span><span class=line><span class=cl>[15:47:43] Elapsed time: 1.191s
+</span></span></code></pre></td></tr></table></div></div><h3 id=排查依赖>排查依赖</h3><p>通过 <code>make menuconfig O=.kunit</code> 发现 <code>CONFIG_KFENCE_KUNIT_TEST</code> 的依赖 <code>CONFIG_TRACEPOINTS</code> 没有被选择，补齐依赖后配置就正常了。</p><p>完整的<code>.kunit/.kunitconfig</code> 如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># kfence
+</span></span><span class=line><span class=cl>CONFIG_HAVE_ARCH_KFENCE=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE=y
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_SAMPLE_INTERVAL=100
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_NUM_OBJECTS=255
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_STRESS_TEST_FAULTS=0
+</span></span><span class=line><span class=cl>CONFIG_KFENCE_KUNIT_TEST=y
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># tracepoints
+</span></span><span class=line><span class=cl>CONFIG_FTRACE=y
+</span></span><span class=line><span class=cl>CONFIG_TRACEPOINTS=y
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># kunit
+</span></span><span class=line><span class=cl>CONFIG_KUNIT=y
+</span></span><span class=line><span class=cl>CONFIG_KUNIT_EXAMPLE_TEST=y
+</span></span></code></pre></td></tr></table></div></div><p>运行 KUnit 测试用例也需要添加 <code>--arch=x86_64</code> ：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># ./tools/testing/kunit/kunit.py run --arch=x86_64
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>[17:42:19] Configuring KUnit Kernel ...
+</span></span><span class=line><span class=cl>[17:42:19] Building KUnit Kernel ...
+</span></span><span class=line><span class=cl>Populating config with:
+</span></span><span class=line><span class=cl>$ make ARCH=x86_64 olddefconfig O=.kunit
+</span></span><span class=line><span class=cl>Building with:
+</span></span><span class=line><span class=cl>$ make ARCH=x86_64 --jobs=4 O=.kunit
+</span></span><span class=line><span class=cl>[17:45:28] Starting KUnit Kernel (1/1)...
+</span></span><span class=line><span class=cl>[17:45:28] ============================================================
+</span></span><span class=line><span class=cl>Running tests with:
+</span></span><span class=line><span class=cl>$ qemu-system-x86_64 -nodefaults -m 1024 -kernel .kunit/arch/x86/boot/bzImage -append &#39;mem=1G console=tty kunit_shutdown=halt console=ttyS0 kunit_shutdown=reboot&#39; -no-reboot -nographic -serial stdio
+</span></span><span class=line><span class=cl>[17:46:03] =================== example (3 subtests) ===================
+</span></span><span class=line><span class=cl>[17:46:03] [PASSED] example_simple_test
+</span></span><span class=line><span class=cl>[17:46:03] [SKIPPED] example_skip_test
+</span></span><span class=line><span class=cl>[17:46:03] [SKIPPED] example_mark_skipped_test
+</span></span><span class=line><span class=cl>[17:46:03] [ERROR] Test example: Expected test number 1 but found 2
+</span></span><span class=line><span class=cl>[17:46:03] ===================== [PASSED] example =====================
+</span></span><span class=line><span class=cl>[17:46:03] ============================================================
+</span></span><span class=line><span class=cl>[17:46:03] Testing complete. Passed: 1, Failed: 0, Crashed: 0, Skipped: 2, Errors: 1
+</span></span><span class=line><span class=cl>[17:46:03] Elapsed time: 224.249s total, 0.002s configuring, 189.405s building, 34.825s running
+</span></span></code></pre></td></tr></table></div></div><p>执行成功，但我们希望的 KFENCE 测试用例也没有出现在结果中。</p><h3 id=kfence-测试用例没有执行>KFENCE 测试用例没有执行？</h3><p>通过上述结果，可以看到在指定 <code>--arch=x86_64</code> 后，变为使用 QEMU 进行测试了。</p><p>日志输出中有完整的 QEMU 命令。直接执行命令，通过虚拟机日志看看问题：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># qemu-system-x86_64 -nodefaults -m 1024 -kernel .kunit/arch/x86/boot/bzImage -append &#39;mem=1G console=tty kunit_shutdown=halt console=ttyS0 kunit_shutdown=reboot&#39; -no-reboot -nographic -serial stdio
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 这里省略了无关 Log
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>BUG: KFENCE: out-of-bounds read in test_out_of_bounds_read+0x85/0x1b1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Out-of-bounds read at 0x(____ptrval____) (1B left of kfence-#3):
+</span></span><span class=line><span class=cl> test_out_of_bounds_read+0x85/0x1b1
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kfence-#3: 0x(____ptrval____)-0x(____ptrval____), size=32, cache=kmalloc-32
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>allocated by task 20 on cpu 0 at 0.381983s:
+</span></span><span class=line><span class=cl> test_alloc+0xf3/0x36e
+</span></span><span class=line><span class=cl> test_out_of_bounds_read+0x76/0x1b1
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CPU: 0 PID: 20 Comm: kunit_try_catch Not tainted 5.17.3-dirty #3
+</span></span><span class=line><span class=cl>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl># 这里省略了部分 Log
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>    ok 24 - test_krealloc
+</span></span><span class=line><span class=cl>    # test_memcache_alloc_bulk: setup_test_cache: size=32, ctor=0x0
+</span></span><span class=line><span class=cl>    ok 25 - test_memcache_alloc_bulk
+</span></span><span class=line><span class=cl># kfence: pass:23 fail:0 skip:2 total:25
+</span></span><span class=line><span class=cl># Totals: pass:23 fail:0 skip:2 total:25
+</span></span><span class=line><span class=cl>ok 1 - kfence
+</span></span></code></pre></td></tr></table></div></div><p>通过日志，看到 KFENCE 已经打印信息了。上述最后3行，也说明 KFENCE 的测试用例执行成功且通过。</p><p>所以 KFENCE 测试用例已经被执行，而且符合预期。</p><h2 id=内核错误解读>内核错误解读</h2><h3 id=invalid-free>invalid free</h3><p>看下这段内核报错日志：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>BUG: KFENCE: invalid free in test_double_free+0xa4/0x118
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Invalid free of 0x(____ptrval____) (in kfence-#18):
+</span></span><span class=line><span class=cl> test_double_free+0xa4/0x118
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kfence-#18: 0x(____ptrval____)-0x(____ptrval____), size=32, cache=kmalloc-32
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>allocated by task 27 on cpu 0 at 1.969091s:
+</span></span><span class=line><span class=cl> test_alloc+0xf3/0x36e
+</span></span><span class=line><span class=cl> test_double_free+0x60/0x118
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>freed by task 27 on cpu 0 at 1.969159s:
+</span></span><span class=line><span class=cl> test_double_free+0x82/0x118
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CPU: 0 PID: 27 Comm: kunit_try_catch Tainted: G    B             5.17.3-dirty #3
+</span></span><span class=line><span class=cl>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>    ok 7 - test_double_free
+</span></span><span class=line><span class=cl>    # test_double_free-memcache: setup_test_cache: size=32, ctor=0x0
+</span></span><span class=line><span class=cl>    # test_double_free-memcache: test_alloc: size=32, gfp=cc0, policy=any, cache=1
+</span></span></code></pre></td></tr></table></div></div><p>第一行日志就清晰说明了问题的原因：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>BUG: KFENCE: invalid free in test_double_free+0xa4/0x118
+</span></span></code></pre></td></tr></table></div></div><p>既然日志中指明了出现问题的函数名和地址，我们就尝试找到这段代码。</p><p>首先使用 <code>nm</code> 命令找到 <code>test_double_free</code> 函数所在的地址：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># nm .kunit/vmlinux | grep test_double_free
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>ffffffff812d3f27 t test_double_free
+</span></span></code></pre></td></tr></table></div></div><p>看到问题函数 <code>test_double_free</code> 位于代码区，地址是 <code>ffffffff812d3f27</code>。</p><p><code>ffffffff812d3f27</code> + <code>0xa4 </code>= <code>ffffffff812d3fcb</code>，使用 <code>addr2line</code> 查看对应的代码行：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl># addr2line -e .kunit/vmlinux ffffffff812d3fcb
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>/home/leesheen/Workdir/linux-kernel/.kunit/../mm/kfence/kfence_test.c:397
+</span></span></code></pre></td></tr></table></div></div><p>定位到问题代码出现在 <code>mm/kfence/kfence_test.c</code> 第 397 的<strong>上一行</strong>。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl> 385   │ static void test_double_free(struct kunit *test)
+</span></span><span class=line><span class=cl> 386   │ {
+</span></span><span class=line><span class=cl> 387   │     const size_t size = 32;
+</span></span><span class=line><span class=cl> 388   │     struct expect_report expect = {
+</span></span><span class=line><span class=cl> 389   │         .type = KFENCE_ERROR_INVALID_FREE,
+</span></span><span class=line><span class=cl> 390   │         .fn = test_double_free,
+</span></span><span class=line><span class=cl> 391   │     };
+</span></span><span class=line><span class=cl> 392   │
+</span></span><span class=line><span class=cl> 393   │     setup_test_cache(test, size, 0, NULL);
+</span></span><span class=line><span class=cl> 394   │     expect.addr = test_alloc(test, size, GFP_KERNEL, ALLOCATE_ANY);
+</span></span><span class=line><span class=cl> 395   │     test_free(expect.addr);
+</span></span><span class=line><span class=cl> 396   │     test_free(expect.addr); /* Double-free. */
+</span></span><span class=line><span class=cl> 397   │     KUNIT_EXPECT_TRUE(test, report_matches(&amp;expect));
+</span></span><span class=line><span class=cl> 398   │ }
+</span></span></code></pre></td></tr></table></div></div><p>定位到的就是 KFENCE 的测试用例，结果符合预期。</p><p>上述就是 double free 的 KUnit 代码，逻辑非常简单，就是对一个地址做两次 <code>free</code> 操作。</p><p>下面也按照问题类型，摘录了 <code>out-of-bounds</code>、 <code>use-after-free </code>和 <code>memory corruption</code> 错误日志的例子。解读的方法与上述相似，就不展开了。</p><h3 id=out-of-bounds>out-of-bounds</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>BUG: KFENCE: out-of-bounds read in test_out_of_bounds_read+0x11e/0x1b1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Out-of-bounds read at 0x(____ptrval____) (32B right of kfence-#6):
+</span></span><span class=line><span class=cl> test_out_of_bounds_read+0x11e/0x1b1
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kfence-#6: 0x(____ptrval____)-0x(____ptrval____), size=32, cache=kmalloc-32
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>allocated by task 20 on cpu 0 at 0.697802s:
+</span></span><span class=line><span class=cl> test_alloc+0xf3/0x36e
+</span></span><span class=line><span class=cl> test_out_of_bounds_read+0x110/0x1b1
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CPU: 0 PID: 20 Comm: kunit_try_catch Tainted: G    B             5.17.3-dirty #3
+</span></span><span class=line><span class=cl>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>    ok 1 - test_out_of_bounds_read
+</span></span><span class=line><span class=cl>    # test_out_of_bounds_read-memcache: setup_test_cache: size=32, ctor=0x0
+</span></span><span class=line><span class=cl>    # test_out_of_bounds_read-memcache: test_alloc: size=32, gfp=cc0, policy=left, cache=1
+</span></span></code></pre></td></tr></table></div></div><h3 id=use-after-free>use-after-free</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>BUG: KFENCE: use-after-free read in test_use_after_free_read+0x8a/0xfc
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Use-after-free read at 0x(____ptrval____) (in kfence-#16):
+</span></span><span class=line><span class=cl> test_use_after_free_read+0x8a/0xfc
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kfence-#16: 0x(____ptrval____)-0x(____ptrval____), size=32, cache=kmalloc-32
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>allocated by task 25 on cpu 0 at 1.753356s:
+</span></span><span class=line><span class=cl> test_alloc+0xf3/0x36e
+</span></span><span class=line><span class=cl> test_use_after_free_read+0x60/0xfc
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>freed by task 25 on cpu 0 at 1.753440s:
+</span></span><span class=line><span class=cl> test_use_after_free_read+0x82/0xfc
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CPU: 0 PID: 25 Comm: kunit_try_catch Tainted: G    B             5.17.3-dirty #3
+</span></span><span class=line><span class=cl>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>    ok 5 - test_use_after_free_read
+</span></span><span class=line><span class=cl>    # test_use_after_free_read-memcache: setup_test_cache: size=32, ctor=0x0
+</span></span><span class=line><span class=cl>    # test_use_after_free_read-memcache: test_alloc: size=32, gfp=cc0, policy=any, cache=1
+</span></span></code></pre></td></tr></table></div></div><h3 id=memory-corruption>memory corruption</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>BUG: KFENCE: memory corruption in test_corruption+0x126/0x19a
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Corrupted memory at 0x(____ptrval____) [ ! ] (in kfence-#23):
+</span></span><span class=line><span class=cl> test_corruption+0x126/0x19a
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>kfence-#23: 0x(____ptrval____)-0x(____ptrval____), size=32, cache=kmalloc-32
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>allocated by task 31 on cpu 0 at 2.508569s:
+</span></span><span class=line><span class=cl> test_alloc+0xf3/0x36e
+</span></span><span class=line><span class=cl> test_corruption+0xfc/0x19a
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>freed by task 31 on cpu 0 at 2.508631s:
+</span></span><span class=line><span class=cl> test_corruption+0x126/0x19a
+</span></span><span class=line><span class=cl> kunit_try_run_case+0x4b/0x70
+</span></span><span class=line><span class=cl> kunit_generic_run_threadfn_adapter+0x11/0x20
+</span></span><span class=line><span class=cl> kthread+0xad/0xe0
+</span></span><span class=line><span class=cl> ret_from_fork+0x22/0x30
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>CPU: 0 PID: 31 Comm: kunit_try_catch Tainted: G    B             5.17.3-dirty #3
+</span></span><span class=line><span class=cl>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ArchLinux 1.16.0-1 04/01/2014
+</span></span><span class=line><span class=cl>==================================================================
+</span></span><span class=line><span class=cl>    ok 11 - test_corruption
+</span></span><span class=line><span class=cl>    # test_corruption-memcache: setup_test_cache: size=32, ctor=0x0
+</span></span><span class=line><span class=cl>    # test_corruption-memcache: test_alloc: size=32, gfp=cc0, policy=left, cache=1
+</span></span></code></pre></td></tr></table></div></div><h2 id=总结>总结</h2><p>经过上述分析，可以看到当打开 KFENCE 后，可以更直接地发现内存相关问题。</p><p>是否直接在线上环境使用？会不会导致性能和稳定性问题？可能还需要一些时间检验。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>文章作者</span>
+<span class=item-content>Lee Sheen</span></p><p class=copyright-item><span class=item-title>上次更新</span>
+<span class=item-content>2022-04-21</span></p><p class=copyright-item><span class=item-title>许可协议</span>
+<span class=item-content><a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/><img alt=知识共享许可协议 style=border-width:0 src=https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png></a></span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/Linux/>Linux</a>
+<a href=/tags/Kernel/>Kernel</a></div><nav class=post-nav><a class=prev href=/post/AgainstInvolution/><i class="iconfont icon-left"></i>
+<span class="prev-text nav-default">“正确”地反内卷</span>
+<span class="prev-text nav-mobile">上一篇</span></a>
+<a class=next href=/post/UseNetbootCustomVps/><span class="next-text nav-default">使用 netboot.xyz 定制 VPS 操作系统</span>
+<span class="next-text nav-mobile">下一篇</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><script src=https://utteranc.es/client.js repo=leesheen/leesheen.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script><noscript>Please enable JavaScript to view the <a href=https://github.com/utterance>comments powered by utterances.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=mailto:lixin.engr@gmail.com class="iconfont icon-email" title=email></a>
+<a href=https://github.com/leesheen class="iconfont icon-github" title=github></a>
+<a href=https://twitter.com/Lee_Sheen class="iconfont icon-twitter" title=twitter></a>
+<a href=https://leesheen.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span>Concept Teach Review Simplify</span>
+<span class=copyright-year>&copy;
+2018 -
+2022<span class=heart><i class="iconfont icon-heart"></i></span><span>Lee Sheen</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script>
+<script type=text/javascript src=/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-226953304-1","auto"),ga("set","anonymizeIp",!0),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>

@@ -1,0 +1,318 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Arch Linux 安装小记 - Lee Sheen ｜ 践行 Feynman 学习法的地方</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="Lee Sheen"><meta name=description content=" "><meta name=keywords content="Lee Sheen,leesheen,Linux,Kernel"><meta name=google-site-verification content="R8TWP3APKMZYoldmneq0ofw6zEVVBIgs5Yv8SiivZ9o"><meta name=generator content="Hugo 0.99.1 with theme even"><link rel=canonical href=https://leesheen.github.io/post/InstallArchLinux/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/sass/main.min.b874a8796a492f0d7c86bb24c33cbf052935783a5778ebaf819a8e514bf49f10.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Arch Linux 安装小记"><meta property="og:description" content=" "><meta property="og:type" content="article"><meta property="og:url" content="https://leesheen.github.io/post/InstallArchLinux/"><meta property="article:section" content="post"><meta property="article:published_time" content="2018-02-09T19:54:53+08:00"><meta property="article:modified_time" content="2018-02-09T19:54:53+08:00"><meta itemprop=name content="Arch Linux 安装小记"><meta itemprop=description content=" "><meta itemprop=datePublished content="2018-02-09T19:54:53+08:00"><meta itemprop=dateModified content="2018-02-09T19:54:53+08:00"><meta itemprop=wordCount content="5256"><meta itemprop=keywords content="Linux,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Arch Linux 安装小记"><meta name=twitter:description content=" "><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>Lee Sheen</a></div><div class=mobile-navbar-icon><span></span>
+<span></span>
+<span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>最近更新</li></a><a href=/post/><li class=mobile-menu-item>归档</li></a><a href=/tags/><li class=mobile-menu-item>标签</li></a><a href=/categories/><li class=mobile-menu-item>分类</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>Lee Sheen</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>最近更新</a></li><li class=menu-item><a class=menu-item-link href=/post/>归档</a></li><li class=menu-item><a class=menu-item-link href=/tags/>标签</a></li><li class=menu-item><a class=menu-item-link href=/categories/>分类</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Arch Linux 安装小记</h1><div class=post-meta><span class=post-time>2018-02-09</span><div class=post-category><a href=/categories/%E6%8A%80%E6%9C%AF/>技术</a></div><span class=more-meta>约 5256 字</span>
+<span class=more-meta>预计阅读 11 分钟</span></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>文章目录</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#1-系统安装>1. 系统安装</a><ul><li><a href=#启动模式>启动模式</a></li><li><a href=#网络连接>网络连接</a></li><li><a href=#时间>时间</a></li><li><a href=#磁盘>磁盘</a></li><li><a href=#镜像>镜像</a></li><li><a href=#fstab>fstab</a></li><li><a href=#chroot>chroot</a></li><li><a href=#安装一些工具>安装一些工具</a></li><li><a href=#本地化>本地化</a></li><li><a href=#时间-1>时间</a></li><li><a href=#ramdisk>ramdisk</a></li><li><a href=#bootloader>Bootloader</a></li><li><a href=#计算机名>计算机名</a></li><li><a href=#root密码>root密码</a></li><li><a href=#完成>完成</a></li></ul></li><li><a href=#2-系统安装后>2. 系统安装后</a><ul><li><a href=#用户>用户</a></li><li><a href=#aur>AUR</a></li><li><a href=#驱动>驱动</a></li><li><a href=#声音>声音</a></li><li><a href=#ssd>SSD</a></li><li><a href=#切换用户>切换用户</a></li></ul></li><li><a href=#3-用户软件安装>3. 用户软件安装</a><ul><li><a href=#gfw>GFW</a></li><li><a href=#git>git</a></li><li><a href=#配置文件>配置文件</a></li><li><a href=#zsh>Zsh</a></li><li><a href=#vim>Vim</a></li><li><a href=#keyboard>Keyboard</a></li><li><a href=#x桌面环境窗口管理器>X/桌面环境/窗口管理器</a></li><li><a href=#浏览器>浏览器</a></li><li><a href=#字体>字体</a></li><li><a href=#输入法>输入法</a></li><li><a href=#terminal>Terminal</a></li><li><a href=#media>Media</a></li><li><a href=#文件管理器>文件管理器</a></li><li><a href=#压缩>压缩</a></li><li><a href=#磁盘-1>磁盘</a></li><li><a href=#markdown>Markdown</a></li><li><a href=#image>Image</a></li><li><a href=#下载>下载</a></li><li><a href=#ssh>SSH</a></li><li><a href=#wps>WPS</a></li><li><a href=#索引>索引</a></li><li><a href=#kvm>KVM</a></li><li><a href=#nfs>NFS</a></li><li><a href=#samba>Samba</a></li><li><a href=#gedit>Gedit</a></li><li><a href=#virtualbox>VirtualBox</a></li><li><a href=#temp>Temp</a></li><li><a href=#android>Android</a></li><li><a href=#build-kernel>build kernel</a></li></ul></li></ul></li></ul></nav></div></div><div class=post-content><blockquote><p>这只是一篇随笔，用来记录从全新安装 Arch Linux 开始，到在使用过程中各种软件配置的过程。本文写于 2018 年，更新于 2022 年。</p></blockquote><p>对于 Arch Linux 这样滚动更新的发行版，很少需要重新安装。只不过在刚开始使用的时候会遇到的一些问题。或有时并没有真正了解原因。所以通过写一些记录文档，并且把一些花时间配置的文件备份下来，无论以后再次使用还是整理思路都是好的。</p><p><strong>注意:</strong> 这<strong>不是</strong>一个安装 Arch Linux 的完整过程，[ArchWiki] <a href=https://wiki.archlinux.org>1</a> 才是。但对于一些用户可以参考。</p><h2 id=1-系统安装>1. 系统安装</h2><h3 id=启动模式>启动模式</h3><p>检查启动模式是否支持UEFI，这将决定在安装 Bootloader 阶段的步骤:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>ls /sys/firmware/efi/efivars
+</span></span></code></pre></td></tr></table></div></div><h3 id=网络连接>网络连接</h3><p>有线用户在 DHCP 可以获取 IP 的情况下，可以直接连接网络，无线用户可以使用下面命令选择无线网络连接:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>wifi-menu -o wlp3s0	<span class=c1># 使用 WiFi</span>
+</span></span></code></pre></td></tr></table></div></div><p>测试网络是否连通:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>ping -c <span class=m>3</span> www.archlinux.org
+</span></span></code></pre></td></tr></table></div></div><h3 id=时间>时间</h3><p>使能 NTP 服务，更新系统时间:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>timedatectl set-ntp <span class=nb>true</span>
+</span></span><span class=line><span class=cl>timedatectl status
+</span></span></code></pre></td></tr></table></div></div><h3 id=磁盘>磁盘</h3><p>查看磁盘信息，以选定使用的磁盘:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>lsblk
+</span></span></code></pre></td></tr></table></div></div><p>创建/更改磁盘信息，这里对磁盘 /dev/sdb 重新分区，使用 gpt 格式:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>parted /dev/sdb
+</span></span><span class=line><span class=cl><span class=o>(</span>parted<span class=o>)</span> mklable gpt
+</span></span><span class=line><span class=cl><span class=o>(</span>parted<span class=o>)</span> mkpart ESP fat32 1MiB 513MiB
+</span></span><span class=line><span class=cl><span class=o>(</span>parted<span class=o>)</span> <span class=nb>set</span> <span class=m>1</span> boot on
+</span></span><span class=line><span class=cl><span class=o>(</span>parted<span class=o>)</span> mkpart primary btrfs 513MiB 100%
+</span></span></code></pre></td></tr></table></div></div><p>格式化分区:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>mkfs.fat -F32 /dev/sdb
+</span></span><span class=line><span class=cl>mkfs.btrfs /dev/sdx
+</span></span></code></pre></td></tr></table></div></div><p>挂载分区，此处最好添加相应的参数，尤其是btrfs:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>mount /dev/sdb2 /mnt -o defaults,noatime,ssd,compress<span class=o>=</span>lzo,subvol<span class=o>=</span>@root
+</span></span><span class=line><span class=cl>mkdir /mnt/boot
+</span></span><span class=line><span class=cl>mount /dev/sdb1 /mnt/boot
+</span></span></code></pre></td></tr></table></div></div><h3 id=镜像>镜像</h3><p>选择安装使用的镜像服务器，一般使用 China 几个，解注释/移动到文件首:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim /etc/pacman.d/mirrorlist
+</span></span></code></pre></td></tr></table></div></div><p>同步镜像服务器并安装:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>pacman -Syy <span class=c1>#一般不需要，但可以测试选择镜像服务器速度用</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>pacstrap /mnt linux linux-firmware base base-devel btrfs-progs
+</span></span></code></pre></td></tr></table></div></div><h3 id=fstab>fstab</h3><p>以UUID的方式生成fstab:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
+</span></span></code></pre></td></tr></table></div></div><p>检查并修改fstab</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>vim /mnt/etc/fstab
+</span></span></code></pre></td></tr></table></div></div><p><del>因为使用SSD并支持TRIM，修改参数减少硬盘写入，并添加discard开启TRIM:</del>
+fstrim.service and fstrim.timer 比上述更常用，某些情况或者分区格式下，
+此方法无效，可以使用discard参数。</p><h3 id=chroot>chroot</h3><p>chroot系统，以完成安装的最后工作:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=line><span class=cl>arch-chroot /mnt
+</span></span></code></pre></td></tr></table></div></div><h3 id=安装一些工具>安装一些工具</h3><p>这里预先安装一些常用的工具，更多工具可以等到系统安装完毕再安装:</p><pre><code>pacman -S vim intel-ucode iw wpa_supplicant dialog zsh 
+# intel-ucode是intel的微码工具
+</code></pre><h3 id=本地化>本地化</h3><p>编辑下面文件，解注释使用到的类型:</p><pre><code>vim /etc/locale.gen
+</code></pre><p>保存后使之生效:</p><pre><code>locale-gen
+</code></pre><p>创建本地化选项:</p><pre><code>echo LANG=en_US.UTF-8 &gt; /etc/locale.conf
+</code></pre><h3 id=时间-1>时间</h3><p>设置时区，并同步到系统时钟:</p><pre><code>ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+hwclock --systohc --utc
+</code></pre><h3 id=ramdisk>ramdisk</h3><p>创建初始的ramdisk:</p><pre><code>mkinitcpio -p linux
+</code></pre><h3 id=bootloader>Bootloader</h3><h4 id=efistub>EFISTUB</h4><p>因为使用 UEFI + GPT，直接使用 systemd 工具生成启动信息:</p><pre><code>bootctl install
+</code></pre><p>创建启动配置文件:</p><pre><code>vim /boot/loader/entires/arch.conf
+</code></pre><p>添加下列信息:</p><pre><code>title		Arch Linux
+linux		/vmlinuz-linux
+initrd		/intel-ucode.img #安装intel-ucode后添加
+initrd		/initramfs-linux.img
+options		root=/dev/sdb2 rw #/文件系统的分区
+</code></pre><p>修改文件默认启动信息:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>vim /boot/loader/loader.conf
+</span></span><span class=line><span class=cl><span class=c1>#add default arch &amp; add timeout 0</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=grub>Grub</h4><p>在需要使用grub引导的情况下，可以安装grub工具：</p><pre><code>pacman -S grub efibootmgr os-prober
+</code></pre><p>配置grub</p><pre><code>grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=grub
+grub-install --target=i386-efi --efi-directory=/boot --bootloader-id=grub
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
+pacman -S breeze-grub
+</code></pre><p>配置/etc/default/grub，添加theme</p><h3 id=计算机名>计算机名</h3><p>设置此系统的名称:</p><pre><code>echo leesheen-X240 &gt; /etc/hostname
+</code></pre><p>并在 /etc/hosts 添加同样的主机名:</p><pre><code>vim /etc/hosts
+# 添加 leesheen-X240 到文件中两行内容的末尾
+</code></pre><h3 id=root密码>root密码</h3><p>设置root用户密码:</p><pre><code>passwd
+</code></pre><h3 id=完成>完成</h3><p>退出chroot环境:</p><pre><code>exit
+</code></pre><p>卸载磁盘:</p><pre><code>umount /mnt -R
+</code></pre><p>重启:</p><pre><code>reboot
+</code></pre><h2 id=2-系统安装后>2. 系统安装后</h2><p>系统重启后以root用户登录系统。</p><h3 id=用户>用户</h3><p>通常我们应该使用普通（非root）用户使用Linux系统，需要root权限时使用sudo。</p><p>创建一个leesheen的用户:</p><pre><code>useradd -m -G wheel -s /bin/zsh leesheen
+passwd leesheen
+</code></pre><p>解注释下面，使得wheel组用户可以拥有sudo权限</p><pre><code>%wheel ALL=(ALL) ALL
+</code></pre><h3 id=aur>AUR</h3><p>Arch Linux 的用户软件源有庞大的资源，这也是Archer热爱它的一个原因，其中yaourt是一个很好的AUR助手工具，能帮助用户自动化中间的过程。</p><p>编辑pacman的配置文件:</p><pre><code>vim /etc/pacman.conf
+</code></pre><p>添加archlinuxcn的源:</p><pre><code>[archlinuxcn]
+SigLevel = Optional TrustAll
+Server = http://mirrors.163.com/archlinux-cn/$arch
+</code></pre><p>Arch Wiki上提供的源有点慢，这里有国内的源的地址，可以测试速度后自行选择:</p><pre><code>Server = http://repo.archlinuxcn.org/$arch
+Server = http://mirrors.ustc.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+Server = http://mirrors.cqu.edu.cn/archlinux-cn/$arch
+Server = http://mirrors.163.com/archlinux-cn/$arch
+Server = http://mirrors.hustunique.com/archlinuxcn/$arch
+Server = http://mirrors.4.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+Server = http://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch # both IPv4 &amp; IPv6
+Server = http://mirrors.6.tuna.tsinghua.edu.cn/archlinuxcn/$arch # only IPv6
+</code></pre><p>修改完后更新源并且安装yaourt:</p><pre><code>pacman -Syu yaourt
+</code></pre><h3 id=驱动>驱动</h3><p>用户主机为ThinkPad X240，Intel Haswell HD4400单集显:</p><p>安装ThinkPad触摸板驱动:</p><pre><code>pacman -S xf86-input-libinput xf86-input-synaptics
+</code></pre><p>安装显示驱动:</p><pre><code>pacman -S mesa-libgl xf86-video-intel vulkan-intel libva-intel-driver libvdpau-va-gl
+mesa-demos
+</code></pre><h3 id=声音>声音</h3><p><del>内核已经集成ALSA驱动，这里安装工具:</del></p><pre><code>pacman -S alsa-utils
+</code></pre><p>ThinkPad X240默认识别两个声卡，把HDMI通道的声卡设置成为默认，这里如果想使用笔记
+本上的声卡，把PCH设置成默认，添加启动加载文件:
+//TODO look pcm</p><pre><code>vim /etc/modprobe.d/alsa-base.conf
+</code></pre><p>添加如下代码设置:</p><pre><code># Set pcm is default sound card
+options snd_pcm index=0
+options snd_hda_intel index=1
+</code></pre><p>重新启动，PCH声卡就变成默认声卡了。</p><h3 id=ssd>SSD</h3><p>开启fstrim</p><pre><code>systemctl enable fstrim.timer
+</code></pre><p>修改调度器</p><p>/etc/udev/rules.d/60-schedulers.rules</p><pre><code># set deadline scheduler for non-rotating disks
+ACTION==&quot;add|change&quot;, KERNEL==&quot;sd[a-z]&quot;, ATTR{queue/rotational}==&quot;0&quot;, ATTR{queue/scheduler}=&quot;noop&quot;
+</code></pre><p>swappiness</p><p>/etc/sysctl.d/99-sysctl.conf</p><pre><code>vm.swappiness=10
+</code></pre><p>profile-sync-daemon</p><pre><code>yaourt  profile-sync-daemon
+</code></pre><p>makepkg for tmpfs
+/etc/makepkg.conf</p><pre><code>BUILDDIR=/tmp/makepkg makepkg
+</code></pre><h3 id=切换用户>切换用户</h3><p>以上操作基本上完成了 Arch Linux 核心部分的安装，下面针对不同的用户和不同的需要进行操作，也会以普通用户身份登录了。</p><p>重启以普通用户身份登录</p><pre><code>reboot
+</code></pre><h2 id=3-用户软件安装>3. 用户软件安装</h2><h3 id=gfw>GFW</h3><h4 id=shadowsocks>Shadowsocks</h4><p>Shadowsocks是一个轻量级socks5代理，以Python写成。</p><p>安装SS:</p><pre><code>sudo pacman -S shadowsocks libsodium python2-numpy python2-salsa20 python2-m2crypto
+</code></pre><p>拷贝默认配置文件:</p><pre><code>sudo cp /etc/shadowsocks/example.json /etc/shadowsocks/config.json
+# 按自己shadowsocks配置修改
+</code></pre><p>后台启动服务并且开机自启:</p><pre><code>sudo systemctl enable shadowsocks@config
+sudo systemctl start shadowsocks@config
+</code></pre><h4 id=proxychains>Proxychains</h4><p>很多时候应用不支持代理或者某些代理方式，Proxychains是一个将socks5等代理类全局化的工具。安装:</p><pre><code>sudo pacman -S proxychains-ng
+</code></pre><p>修改配置文件/etc/proxychains.conf</p><pre><code># 修改最后一行
+socks5 127.0.0.1 1080
+</code></pre><p>然后就可以在Terminal中使用它让xxx应用走socks5代理:</p><pre><code>proxychains xxx
+</code></pre><h3 id=git>git</h3><p>git不仅仅是一个版本管理工具，很多时候也是我们获取内容的工具。安装:</p><pre><code>sudo pacman -S git
+</code></pre><p>配置git:</p><pre><code>git config --global user.name &quot;Lee Sheen&quot;
+git config --global user.email &quot;leesheen@outlook.com&quot;
+</code></pre><p>很多时候访问Github很难，而我大部分git都是在Github上完成的，所以让所有的git都使用socks5代理来保证速度。当然也可以不添加，在访问困难的时候配合Proxychains使用，添加代理信息:</p><pre><code>git config --global https.proxy 'socks5://127.0.0.1:1080'
+git config --global http.proxy 'socks5://127.0.0.1:1080'
+</code></pre><h3 id=配置文件>配置文件</h3><p>为了同步多太电脑配置方便，我把一些配置文件同步到Github，先把配置文件clone下来:</p><pre><code>mkdir ~/Tools
+cd ~/Tools
+
+git clone https://www.github.com/leesheen/config-linux.git
+</code></pre><p>在~/Tools/config-linux/下就是后面需要的配置文件了。</p><h3 id=zsh>Zsh</h3><p>Zsh是一个功能强大的Shell，我们用其代替系统默认的bash。在前我们已经安装:</p><pre><code># pacman -S zsh
+</code></pre><p>Zsh的高可定制性使我们获得一个优秀配置变得比较复杂，还好有个开源项目叫Oh-my-zsh，使用官网的脚本直接配置安装:</p><pre><code>sh -c &quot;$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)&quot;
+
+# 或者使用wget
+
+sh -c &quot;$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&quot;
+
+# 没有速度可配合Proxychains使用，或者执行备份脚本的内容:
+
+./Tools/config-linux/script/ohmyzsh_install.sh
+</code></pre><p>添加alias</p><pre><code>vim .zshrc
+
+#添加需要的alias到最后
+alias pcs='proxychains -q'
+</code></pre><p>**注意：**如果想在root用户下也使用zsh的此配置，在root用户下执行上面的命令</p><p>添加zsh-autosuggestions</p><pre><code>git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
+</code></pre><p>添加至zshrc</p><pre><code>plugins=(zsh-autosuggestions)
+</code></pre><h3 id=vim>Vim</h3><p>Vim是一个强大的编辑器，对我来说最强大之处在于它的速度，任何大小的文件处理起来没有卡顿。无论是码代码还是Markdown，它的顺滑让我的工作更加专注，此前在安装初期我们已经安装:</p><pre><code># pacman -S vim
+</code></pre><ul><li>YCM</li></ul><p>YouCompleteMe拥有强大的补全和语义检查功能，安装:</p><pre><code>yaourt vim-youcompleteme-git
+</code></pre><p>YCM检查语义需要clang的支持，安装:</p><pre><code>pacman -S clang
+</code></pre><p>链接全局配置文件到配置目录j</p><ul><li>Ctags</li></ul><p>Ctags是Linux下的跟踪文件的利器，安装:</p><pre><code>pacman -S ctags cscope
+</code></pre><ul><li>Vundle</li></ul><p>它的强大之处也在于它的高可定制行，丰富的插件让我们的工作更加简单，但和其他插件丰富的工具（Chrome/Atom）不同的是，它没有一个官方的渠道管理这些插件，所以使用一个插件来管理这些插件，它叫Vundle，使用git安装:</p><pre><code>git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+</code></pre><p>把配置好的vimrc链接到家目录的vimrc:</p><pre><code>ln ~/Tools/config-linux/config/vimrc ~/.vimrc
+</code></pre><p>键入命令安装插件:</p><pre><code>vim +PluginInstall +qall 
+</code></pre><p>**注意：**如果使root用户或者sudo下使用vim也插件化，上述步骤在root用户下也操作一遍其中PowerLine插件需要额外的字体，安装:</p><pre><code>yaourt ttf-cosolas-powerline
+</code></pre><p>Ubuntu 下设置</p><pre><code>http://blog.topspeedsnail.com/archives/2652
+</code></pre><h3 id=keyboard>Keyboard</h3><p>Xbindkeys是一个可以允许用户自定义键值的程序，我们可以利用它来自定义一些按键，比
+如静音和增减音量的快捷键不能使用等，安装:</p><pre><code>sudo pacman -S xbindkeys
+</code></pre><p>这里使用配置文件中的配置:</p><pre><code>ln ~/Tools/config-linux/config/xbindkeysrc ~/.xbindkeysrc
+</code></pre><p>这个文件使用了以下工具</p><ul><li>Sound: <strong>alsa-utils</strong> 上述已经安装；</li><li>BackLight: <strong>xinit-backlight</strong> 上述已经安装；</li><li>MultiScreen: <strong>lxrandr</strong> 需要安装；</li><li>Wi-Fi: 默认按键可以使用up/down Wi-Fi；</li><li>Setting: TODO</li><li>Search: TODO</li><li>Finder: <strong>xfce4-appfinder</strong> 下述xfce4安装；</li><li>FileManager: <strong>nautilus</strong> 下述xfce4安装；</li></ul><p>安装上述需要安装的工具:</p><pre><code>sudo pacman -S lxrandr arandr
+</code></pre><p><del>添加xbindkeys启动到xinitrc</del>，下面配置文件中已经包含。</p><h3 id=x桌面环境窗口管理器>X/桌面环境/窗口管理器</h3><h4 id=xorg>Xorg:</h4><p>Xorg 是 X11 窗口系统的一个开源实现，当使用桌面环境或者窗口管理器时需要X配合，
+安装Xorg和其工具包:</p><pre><code>sudo pacman -S xorg-server xorg-server-utils xorg-apps xorg-xinit
+
+ln ~/Tools/config-linux/config/xinitrc ~/.xinitrc
+# 其中添加了fcitx和启动i3
+cp /etc/X11/xinitrc/xserverrc ~/.xserverrc
+</code></pre><h4 id=安装gnome>安装gnome</h4><p>安装gnome</p><pre><code>sudo pacman -S xfce4 xfce4-goodies
+</code></pre><p>其他配置参见xfce4</p><h4 id=安装xfce>安装Xfce</h4><p>xfce4是一个轻量级模块化的桌面环境。一般在需要桌面环境的时候作为备用。</p><ul><li>安装:</li></ul><p>安装xfce4和常用软件包:</p><pre><code>sudo pacman -S xfce4 xfce4-goodies
+
+yaourt solarized-dark-themes
+</code></pre><p>安装NetworkManager</p><pre><code>pacman -S networkmanager network-manager-applet xfce4-notifyd dnsmasq ppp rp-pppoe modemmanager
+
+sudo systemctl enable NetworkManager
+sudo systemctl start NetworkManager
+</code></pre><p>安装Bluetooth:</p><pre><code>pacman -S bluez bluez-utils blueman
+
+sudo systemctl enable bluetooth
+sudo systemctl start bluetooth
+</code></pre><p>如果需要开机启动蓝牙，添加下面文件:</p><pre><code>vim /etc/udev/rules.d/10-local.rules
+
+# Set bluetooth power up
+ACTION==&quot;add&quot;, KERNEL==&quot;hci0&quot;, RUN+=&quot;/usr/bin/hciconfig hci0 up&quot;
+</code></pre><p>配对蓝牙鼠标:</p><p>如果使用双系统，而且使用蓝牙鼠标，那么让两个系统使用不用每次配对:</p><pre><code>sudo pacman -S chntpw
+
+mount /dev/sda4 /mnt/tmp/				# 挂载Windows安装目录
+cd /mnt/tmp/Windows/System32/config/ 
+
+chntpw -e SYSTEM 
+</code></pre><p>在chntpw下执行:</p><pre><code>cd ControlSet001\Services\BTHPORT\Parameters\Keys 
+ls										# 查看蓝牙的名称，选择进入
+cd 5c514f631027 
+</code></pre><p><img src=/images/InstallArchLinux/bt-mouse.webp alt=Bluetooth-Mouse></p><p>复制上图的16进制代码并删除空格</p><pre><code>90C13638D41763DF52243F17D566146F
+
+su 										# 切换到root模式
+cd /var/lib/bluetooth/
+ls										# 查看蓝牙名称，应与上述一致
+cd 5c:51:4f:63:10:27 
+ls
+cd 00:1F:20:A9:DB:71
+
+vim info 
+</code></pre><p>把上述复制的16进制代码替换Key的值，保存重启即生效。</p><p>安装VPN:</p><pre><code>yaourt strongswan 
+yaourt networkmanager-strongswan
+</code></pre><h4 id=安装i3窗口管理器>安装i3窗口管理器:</h4><ul><li>安装i3-wm:</li></ul><p>窗口管理器的效率在习惯养成后远远大于桌面环境，awesome/i3-wm等都是代表者，而i3-wm更是简单高效。</p><pre><code>sudo pacman -S i3
+</code></pre><ul><li><p>安装工具:</p><p>yaourt j4-dmenu-desktop-git
+yaourt py3status-git</p></li><li><p>配置文件</p></li></ul><p>创建i3的配置文件:</p><pre><code>mkdir -p ~/.config/i3 ~/.config/i3status
+ln ~/Tools/config-linux/config/i3/config ~/.config/i3/config
+ln ~/Tools/config-linux/config/i3/i3status ~/.config/i3status/config
+</code></pre><p>背景</p><pre><code>pacman -S feh imagemagick
+
+feh --bg-scale /path/to/image
+</code></pre><ul><li>使用X</li></ul><p>安装配置完成就可以进入X了，通常进入i3:</p><pre><code>startx
+</code></pre><h3 id=浏览器>浏览器</h3><p>个人喜欢Chrome浏览器，在Arch下Pacman库中为开源的Chromium，不包含Flash组件，但现在国内的很多网站下缺少不了Flash，我选择同时安装，在移动状态下使用电池时选择Chromium。安装Chrome/Chromium:</p><pre><code>sudo pacman -S chromium
+
+yaourt google-chrome-stable
+</code></pre><p>Flash</p><h3 id=字体>字体</h3><p>安装常用的英文字体和中文字体，个人很喜欢adebe的source系列开源字体，安装:</p><pre><code>sudo pacman -S ttf-dejavu wqy-microhei
+sudo pacman -S adobe-source-han-sans-cn-fonts \
+	adobe-source-code-pro-fonts \
+	adobe-source-han-serif-cn-fonts \
+	adobe-source-sans-pro-fonts \
+	adobe-source-serif-pro-fonts
+
+yaourt ttf-monaco
+yaourt inziu
+</code></pre><p>//TODO 配置Terminal默认中文字体</p><h3 id=输入法>输入法</h3><p>个人喜欢使用fcitx框架，在此框架下提供的中文输入法比较好用，这里只选择安装sogou输入法:</p><pre><code>sudo pacman -S fcitx fcitx-im fcitx-qt5 fcitx-configtool
+
+yaourt fcitx-sogoupinyin
+</code></pre><p>在X下使用fcitx-configtool添加Sogou Pinyin，重新加载fcitx后，使用shift键就可以切换中/英文了。</p><p>添加环境变量至.xprofile, 配置文件在config中</p><h3 id=terminal>Terminal</h3><p>以为之前使用KDE Plasma，很喜欢Konsole</p><pre><code>pacman -S konsole
+</code></pre><h4 id=xfce4-terminal>xfce4-terminal</h4><p>在xfce安装过程中已经安装过xfce4-terminal。</p><p>添加配置文件:</p><pre><code># 创建配置文件目录
+mkdir -p ~/.config/xfce4/terminal
+# 链接配置文件
+ln ~/Tools/config-linux/terminalrc ~/.config/xfce4/terminal/terminalrc
+</code></pre><h4 id=konsole><del>Konsole</del></h4><p><del>安装Konsole，选择VLC为后端:</del></p><pre><code># sudo pacman -S konsole
+</code></pre><h3 id=media>Media</h3><h4 id=mplayer>MPlayer</h4><p>MPlayer是一个开源的播放器，快速好用，安装:</p><pre><code>sudo pacman -S gnome-mplayer
+# 自带解码包依赖
+</code></pre><p>TODO: 配置文件字幕</p><h4 id=heading></h4><h3 id=文件管理器>文件管理器</h3><p>通常使用xfce4下的thunar，一般情况下也很少用到，安装xfce4已经包含thunar。</p><ul><li>Dropbox
+yaourt thunar-dropbox
+yaourt dropbox-experimental</li></ul><h3 id=压缩>压缩</h3><p>安装常用的压缩/解压缩的工具:</p><pre><code>sudo pacman -S unzip p7zip lzop cpio unrar
+</code></pre><h3 id=磁盘-1>磁盘</h3><p>之前使用Windows，所以硬盘中包含NTFS分区和额外的ext4分区，首先安装必要的磁盘工具支持fat/ntfs/exfat/hfs等分区格式:</p><pre><code>sudo pacman -S parted exfat-utils ntfs-3g dosfstools hfsprogs hdparm 
+</code></pre><p>上述的配置文件里面有默认的fstab，把硬盘1中Windows使用的NTFS分区（Data）和Linux EXT4（Data）挂载到/mnt下相应设备名称的目录下:</p><pre><code>sudo mkdir /mnt/sda6 /mnt/sda8 /mnt/sda9 /mnt/tmp
+sudo chmod g+w *
+
+sudo ln ~/Tools/config-linux/config/fstab /etc/fstab
+# 危险，应该添加额外的配置
+
+sudo hdparm -I /dev/sdb | grep TRIM
+
+systemctl enable fstrim.service fstrim.timer
+systemctl start fstrim.service fstrim.timer
+</code></pre><h3 id=markdown>Markdown</h3><p>有很多比较好的MD工具，像Atom、Remarkable等，但Remarkable预览总有问题，Atom用起来有略微卡顿，所以还是使用vim编辑，Chrome插件实时预览的方式。</p><h4 id=atom>Atom</h4><p>Atom是Github官方的编辑器，原生支持Markdown，安装Atom:</p><pre><code>yaourt atom-editor
+</code></pre><p>Atom和其他出色的编辑工具一样，拥有众多插件，这里安装Markdown相关的MD转PDF和vim模式的插件:</p><pre><code>apm vim-mode ex-mode markdown-pdf
+# Atom的插件在Github上，可以使用proxychains协助安装
+</code></pre><h4 id=vim--chrome插件>Vim + Chrome插件</h4><ul><li><p>在Chrome的WebStore中搜索Markdown Preview Plus并安装</p></li><li><p>打开chrome://extensions/，在其设置页中勾选 &ldquo;Allow access to file URLs&rdquo;</p></li><li><p>在Chrome中打开本地Markdown文件，http/https也是可以支持的，你会看到已经转换成html的内容</p></li><li><p>在Chrome地址栏输入文件路径打开Markdown文件，用vim编辑Markdown，保存后页面就会自动刷新，实现预览。</p></li></ul><p><img src=/images/InstallArchLinux/md.webp alt=Markdown-Vim-Chrome></p><p>在vimrc中加入以下内容：</p><pre><code>autocmd BufRead,BufNewFile *.{md,mdown,mkd,mkdn,markdown,mdwn} map &lt;Leader&gt;p :!start &quot;C:\Program Files\Google\Chrome\Application\chrome.exe&quot; &quot;%:p&quot;&lt;CR&gt;
+</code></pre><p>需要预览时输入\p打开浏览器预览。</p><h3 id=image>Image</h3><p>imagemagick</p><h3 id=下载>下载</h3><p>wget</p><h3 id=ssh>SSH</h3><pre><code>pacman -S openssh
+yaourt openssh-hpn-git
+</code></pre><h3 id=wps>WPS</h3><pre><code>yaourt wps-office ttf-wps-fonts
+</code></pre><h3 id=索引>索引</h3><pre><code>pacman -S mlocate
+updatedb
+</code></pre><h3 id=kvm>KVM</h3><pre><code>pacman -S qemu libvirt pm-util virt-manager
+pacman -S ebtables dnsmasq bridge-utils openbsd-netcat
+</code></pre><p>修改配置文件:</p><pre><code>vim /etc/libvirt/libvirtd.conf
+
+# 解注释下面的配置
+unix_sock_group = &quot;libvirt&quot;
+unix_sock_ro_perms = &quot;0777&quot;  # set to 0770 to deny non-group libvirt users
+unix_sock_rw_perms = &quot;0770&quot;
+auth_unix_ro = &quot;none&quot;
+auth_unix_rw = &quot;none&quot;
+
+systemctl enable libvirtd.service virtlogd.service
+systemctl start libvirtd.service virtlogd.service
+</code></pre><h3 id=nfs>NFS</h3><pre><code>pacman -S nfs-utils
+</code></pre><p>配置文件</p><pre><code>vim /etc/exports
+添加
+/srv/nfs4/ 192.168.1.0/24(rw,fsid=root,no_subtree_check)
+/srv/nfs4/music 192.168.1.0/24(rw,no_subtree_check,nohide) # note the nohide option which is applied to mounted directories on the file system.
+
+vim /etc/conf.d/nfs-server.conf
+
+添加
+NFSD_OPTS=&quot;-N 2 -N 3&quot;
+</code></pre><p>启动服务</p><pre><code>systemctl enable nfs-server
+systemctl start nfs-server
+</code></pre><h3 id=samba>Samba</h3><pre><code>pacman -S samba
+cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+</code></pre><h3 id=gedit>Gedit</h3><h3 id=virtualbox>VirtualBox</h3><pre><code>pacman -S virtualbox virtualbox-guest-iso qt4 net-tools
+yaourt virtualbox-ext-oracle
+
+gpasswd -a leesheen vboxusers
+</code></pre><h3 id=temp>Temp</h3><pre><code>pacman -S hddtemp
+</code></pre><h3 id=android>Android</h3><pre><code>yaourt android-sdk
+yaourt android-studio
+pacman -S android-tools
+pacman -S android-udev
+</code></pre><h3 id=build-kernel>build kernel</h3><pre><code>pacman -S base-devel xmlto docbook-xsl kmod inetutils bc
+</code></pre></div><div class=post-copyright><p class=copyright-item><span class=item-title>文章作者</span>
+<span class=item-content>Lee Sheen</span></p><p class=copyright-item><span class=item-title>上次更新</span>
+<span class=item-content>2018-02-09</span></p><p class=copyright-item><span class=item-title>许可协议</span>
+<span class=item-content><a rel=license href=http://creativecommons.org/licenses/by-nc-sa/4.0/><img alt=知识共享许可协议 style=border-width:0 src=https://i.creativecommons.org/l/by-nc-sa/4.0/80x15.png></a></span></p></div><footer class=post-footer><div class=post-tags><a href=/tags/Linux/>Linux</a></div><nav class=post-nav><a class=prev href=/post/SilentSpring/><i class="iconfont icon-left"></i>
+<span class="prev-text nav-default">《寂静的春天》</span>
+<span class="prev-text nav-mobile">上一篇</span></a></nav></footer></article></div><script src=https://utteranc.es/client.js repo=leesheen/leesheen.github.io issue-term=pathname theme=github-light crossorigin=anonymous async></script><noscript>Please enable JavaScript to view the <a href=https://github.com/utterance>comments powered by utterances.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=mailto:lixin.engr@gmail.com class="iconfont icon-email" title=email></a>
+<a href=https://github.com/leesheen class="iconfont icon-github" title=github></a>
+<a href=https://twitter.com/Lee_Sheen class="iconfont icon-twitter" title=twitter></a>
+<a href=https://leesheen.github.io/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span>Concept Teach Review Simplify</span>
+<span class=copyright-year>&copy;
+2018 -
+2022<span class=heart><i class="iconfont icon-heart"></i></span><span>Lee Sheen</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script>
+<script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script>
+<script type=text/javascript src=/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js></script>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga("create","UA-226953304-1","auto"),ga("set","anonymizeIp",!0),ga("send","pageview"))</script><script async src=https://www.google-analytics.com/analytics.js></script></body></html>
